@@ -6,32 +6,32 @@
     <ul class="sidebar-menu">
         <li>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                Dashboard
+                Bảng điều khiển
             </a>
         </li>
         
         <li>
             <a href="{{ route('admin.rooms.index') }}" class="sidebar-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
-                Manage Rooms
+                Quản lý phòng
             </a>
         </li>
         
         <li>
             <a href="{{ route('admin.bookings.index') }}" class="sidebar-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
-                View Bookings
+                Quản lý đặt phòng
             </a>
         </li>
         
         <li>
             <a href="{{ route('profile.index') }}" class="sidebar-link">
-                My Profile
+                Thông tin cá nhân
             </a>
         </li>
         
         <li>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="sidebar-link logout">Logout</button>
+                <button type="submit" class="sidebar-link logout">Đăng xuất</button>
             </form>
         </li>
     </ul>

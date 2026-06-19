@@ -8,7 +8,7 @@
 
     <div class="col-md-8">
 
-        <img src="{{ $room->thumbnail_url }}"
+        <img src="{{ $room->thumbnail_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500' }}"
              class="img-fluid rounded">
 
         <p class="mt-3">
