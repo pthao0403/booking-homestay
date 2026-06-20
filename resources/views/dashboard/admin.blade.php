@@ -20,7 +20,7 @@
 
                     <h2>20</h2>
 
-                    <p>Tổng số phòng</p>
+                    <p>Tổng phòng</p>
 
                 </div>
 
