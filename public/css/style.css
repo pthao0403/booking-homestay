@@ -1,0 +1,468 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+--primary:#0d6efd;
+--secondary:#198754;
+--danger:#dc3545;
+--dark:#212529;
+--light:#f8f9fa;
+--muted:#6c757d;
+}
+
+html,
+body{
+min-height:100vh;
+font-family:'Inter',sans-serif;
+background:#f8f9fa;
+color:#212529;
+}
+
+/* ==========================
+NAVBAR
+========================== */
+
+.navbar{
+background:#fff !important;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.navbar-brand{
+font-weight:700;
+color:var(--primary) !important;
+font-size:1.4rem;
+}
+
+/* ==========================
+HERO
+========================== */
+
+.hero{
+position:relative;
+min-height:80vh;
+display:flex;
+align-items:center;
+}
+
+.hero-bg{
+position:absolute;
+inset:0;
+background:url('/images/homestay-banner.jpg');
+background-size:cover;
+background-position:center;
+}
+
+.hero-overlay{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,.55);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+}
+
+.hero-kicker{
+display:inline-block;
+padding:8px 18px;
+border-radius:30px;
+background:rgba(255,255,255,.2);
+color:#fff;
+margin-bottom:15px;
+}
+
+.hero-title{
+color:#fff;
+font-size:3.5rem;
+font-weight:800;
+}
+
+.hero-sub{
+color:#f1f1f1;
+font-size:1.1rem;
+max-width:650px;
+}
+
+.search-box{
+background:#fff;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 25px rgba(0,0,0,.15);
+}
+
+.search-box .form-control{
+height:50px;
+}
+
+.stat-card{
+background:#fff;
+border-radius:15px;
+padding:15px;
+min-width:120px;
+text-align:center;
+}
+
+.stat-number{
+font-size:1.5rem;
+font-weight:700;
+color:var(--primary);
+}
+
+.stat-label{
+color:var(--muted);
+}
+
+/* ==========================
+SECTION
+========================== */
+
+.section-spaced{
+padding:80px 0;
+}
+
+.section-title{
+font-weight:700;
+margin-bottom:15px;
+}
+
+/* ==========================
+ROOM CARD
+========================== */
+
+.room-card{
+border:none;
+border-radius:20px;
+overflow:hidden;
+transition:.3s;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.room-card:hover{
+transform:translateY(-8px);
+}
+
+.room-image{
+height:250px;
+object-fit:cover;
+}
+
+.room-card .card-body{
+padding:20px;
+}
+
+/* ==========================
+FEATURE CARD
+========================== */
+
+.feature-card{
+background:#fff;
+border-radius:15px;
+padding:25px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,.06);
+height:100%;
+}
+
+/* ==========================
+NEWS CARD
+========================== */
+
+.news-card{
+border:none;
+border-radius:20px;
+overflow:hidden;
+background:#fff;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.news-image{
+height:220px;
+background-size:cover;
+background-position:center;
+}
+
+.news-title{
+font-size:1.2rem;
+font-weight:700;
+}
+
+.btn-gold{
+background:#ffc107;
+border:none;
+color:#212529;
+}
+
+.btn-gold:hover
+
+/* ==========================
+NEWSLETTER
+========================== */
+
+.newsletter{
+background:linear-gradient(
+135deg,
+var(--primary),
+#4f8cff
+);
+color:#fff;
+border-radius:20px;
+}
+
+.newsletter input{
+height:50px;
+}
+
+/* ==========================
+FOOTER
+========================== */
+
+footer{
+background:#212529;
+color:#fff;
+margin-top:80px;
+}
+
+footer a{
+color:#fff;
+text-decoration:none;
+}
+
+footer a:hover
+
+footer .bi{
+font-size:22px;
+}
+
+/* ==========================
+BUTTON
+========================== */
+
+.btn-primary{
+background:var(--primary);
+border-color:var(--primary);
+}
+
+.btn-primary:hover
+
+.btn-outline{
+border:1px solid #dee2e6;
+}
+
+/* ==========================
+RESPONSIVE
+========================== */
+
+@media(max-width:992px){
+
+.hero{
+    min-height:auto;
+    padding:60px 0;
+}
+
+.hero-title{
+    font-size:2.5rem;
+}
+
+.hero-sub{
+    font-size:1rem;
+}
+
+.hero-visual{
+    margin-top:30px;
+}
+}
+
+@media(max-width:576px){
+.hero-title{
+    font-size:2rem;
+}
+
+.room-image{
+    height:200px;
+}
+
+.section-spaced{
+    padding:50px 0;
+}
+}
+/* LOGIN PAGE */
+
+.login-page{
+background:#f8f9fa;
+}
+.login-card{
+border-radius:25px;
+overflow:hidden;
+background:white;
+}
+
+.login-banner{
+    position:relative;
+    min-height:600px;
+    background-image:
+    url('/images/homestay-login.jpg');
+    background-size:cover;
+    background-position:center;
+}
+
+.login-overlay{
+position:absolute;
+inset:0;
+background:
+linear-gradient(
+    135deg,
+    rgba(13,110,253,.85),
+    rgba(25,135,84,.75)
+);
+}
+
+.login-info{
+position:relative;
+z-index:2;
+color:white;
+padding:60px;
+}
+
+.login-info h1{
+font-size:45px;
+font-weight:800;
+}
+
+.login-info h3{
+margin-top:30px;
+}
+
+.login-feature div{
+margin-top:20px;
+font-size:18px;
+}
+
+.login-form{
+padding:60px 50px;
+}
+
+.login-form h2{
+font-weight:800;
+}
+
+.btn-google{
+border:1px solid #ddd;
+
+background:white;
+
+height:50px;
+}
+
+.btn-google img{
+width:20px;
+margin-right:10px;
+}
+
+.btn-google:hover{
+background:#f8f9fa;
+}
+
+@media(max-width:992px){
+.login-banner{
+    display:none;}
+.login-form{
+    padding:40px 25px;
+}
+}
+/* ROOM PAGE */
+
+.room-banner{
+    background:
+    linear-gradient(
+        rgba(0,0,0,.5),
+        rgba(0,0,0,.5)
+    ),
+    url('/images/homestay-banner.jpg');
+
+    background-size:cover;
+    background-position:center;
+
+    padding:100px 0;
+    border-radius:20px;
+}
+
+.room-banner h1{
+    font-size:3rem;
+    font-weight:800;
+}
+
+.room-image{
+    height:250px;
+    object-fit:cover;
+}
+
+.room-card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.room-card:hover{
+    transform:translateY(-8px);
+}
+.search-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+/* ROOM DETAIL */
+
+.room-detail-banner{
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,.55),
+        rgba(0,0,0,.55)
+    ),
+    url('/images/homestay-banner.jpg');
+
+    background-size:cover;
+    background-position:center;
+
+    padding:120px 0;
+}
+
+.main-image{
+
+    width:100%;
+    height:500px;
+
+    object-fit:cover;
+
+    border-radius:20px;
+}
+
+.gallery-thumb{
+
+    width:100%;
+    height:120px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    cursor:pointer;
+}
+
+.booking-card{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    box-shadow:0 5px 25px rgba(0,0,0,.08);
+
+    position:sticky;
+
+    top:100px;
+}
