@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 // Home Page
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('rooms.index');
 })->name('home');
 
 // Authentication Routes
