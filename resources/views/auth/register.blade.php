@@ -1,259 +1,51 @@
 @extends('layouts.app')
 
-@section('title','Đăng ký - CloudStay')
+@section('title', 'Đăng ký tài khoản - CloudStay')
 
 @section('content')
-
-<div class="login-page">
-
-<div class="container">
-
-    <div class="row justify-content-center align-items-center min-vh-100">
-
-        <div class="col-lg-10">
-
-            <div class="login-card shadow-lg">
-
-                <div class="row g-0">
-                    <!-- LEFT CONTENT -->
-
-                    <div class="col-lg-6 login-banner">
-
-                        <div class="login-overlay"></div>
-
-
-                        <div class="login-info">
-
-
-                            <h1>
-                                CloudStay
-                            </h1>
-
-
-                            <h3>
-                                Bắt đầu hành trình
-                                khám phá homestay
-                            </h3>
-
-
-                            <p>
-                                Tạo tài khoản miễn phí để
-                                đặt phòng nhanh chóng,
-                                lưu lịch sử booking và nhận
-                                ưu đãi hấp dẫn.
-                            </p>
-
-
-
-                            <div class="login-feature">
-
-
-                                <div>
-                                    🏡
-                                    <span>
-                                        Hàng nghìn homestay
-                                    </span>
-                                </div>
-
-
-                                <div>
-                                    📅
-                                    <span>
-                                        Quản lý đặt phòng dễ dàng
-                                    </span>
-                                </div>
-
-
-                                <div>
-                                    🎁
-                                    <span>
-                                        Nhận ưu đãi độc quyền
-                                    </span>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- REGISTER FORM -->
-
-                    <div class="col-lg-6 bg-white">
-
-
-                        <div class="login-form">
-
-
-                            <h2>
-                                Tạo tài khoản
-                            </h2>
-
-
-                            <p class="text-muted">
-                                Đăng ký để trải nghiệm CloudStay
-                            </p>
-
-
-
-                            @if($errors->any())
-
-                            <div class="alert alert-danger">
-
-                                <ul class="mb-0">
-
-                                    @foreach($errors->all() as $error)
-
-                                    <li>
-                                        {{$error}}
-                                    </li>
-
-                                    @endforeach
-
-                                </ul>
-
-                            </div>
-
-                            @endif
-
-                            <form method="POST"
-                                  action="/register">
-
-                                @csrf
-
-                                <!-- NAME -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Họ và tên
-                                    </label>
-
-                                    <input type="text"
-                                           name="name"
-                                           class="form-control"
-                                           placeholder="Nhập họ tên"
-                                           value="{{old('name')}}"
-                                           required>
-
-                                </div>
-
-                                <!-- EMAIL -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Email
-                                    </label>
-
-
-                                    <input type="email"
-                                           name="email"
-                                           class="form-control"
-                                           placeholder="Nhập email"
-                                           value="{{old('email')}}"
-                                           required>
-
-                                </div>
-
-                                <!-- PASSWORD -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Mật khẩu
-                                    </label>
-
-                                    <input type="password"
-                                           name="password"
-                                           class="form-control"
-                                           placeholder="Nhập mật khẩu"
-                                           required>
-
-                                </div>
-
-                                <!-- CONFIRM PASSWORD -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Xác nhận mật khẩu
-                                    </label>
-
-                                    <input type="password"
-                                           name="password_confirmation"
-                                           class="form-control"
-                                           placeholder="Nhập lại mật khẩu"
-                                           required>
-
-                                </div>
-
-                                <div class="form-check mb-3">
-
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           required>
-
-                                    <label class="form-check-label">
-
-                                        Tôi đồng ý với điều khoản sử dụng
-
-                                    </label>
-
-                                </div>
-
-                                <button class="btn btn-primary w-100">
-
-                                    Đăng ký
-
-                                </button>
-
-                            </form>
-
-                            <div class="text-center my-3">
-
-                                <span class="text-muted">
-                                    Hoặc
-                                </span>
-
-                            </div>
-
-                            <!-- GOOGLE REGISTER -->
-
-                            <a href="/auth/google"
-                               class="btn btn-google w-100">
-
-                                <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png">
-
-                                Đăng ký bằng Google
-
-                            </a>
-
-                            <p class="text-center mt-4">
-
-                                Đã có tài khoản?
-
-                                <a href="/login">
-
-                                    Đăng nhập
-
-                                </a>
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+<div class="auth-container" style="max-width: 500px; margin: 3rem auto;">
+    <div class="auth-card" style="background: #f8fafc; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+        <h2 class="text-center fw-bold mb-4" style="color: #0f172a;">Đăng Ký Tài Khoản</h2>
+        
+        <form action="{{ route('register') }}" method="POST" class="auth-form bg-white p-4 rounded-3 border">
+            @csrf
+            
+            <div class="form-group mb-3 text-start">
+                <label for="name" class="form-label fw-semibold text-secondary">Họ và Tên</label>
+                <input type="text" id="name" name="name" class="form-control" required value="{{ old('name') }}" style="border-radius: 8px; padding: 0.75rem;" placeholder="Nhập đầy đủ họ và tên">
+                @error('name')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
             </div>
-        </div>
-
+            
+            <div class="form-group mb-3 text-start">
+                <label for="email" class="form-label fw-semibold text-secondary">Địa chỉ Email</label>
+                <input type="email" id="email" name="email" class="form-control" required value="{{ old('email') }}" style="border-radius: 8px; padding: 0.75rem;" placeholder="example@email.com">
+                @error('email')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group mb-3 text-start">
+                <label for="password" class="form-label fw-semibold text-secondary">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control" required style="border-radius: 8px; padding: 0.75rem;" placeholder="Tối thiểu 6 ký tự">
+                @error('password')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group mb-4 text-start">
+                <label for="password_confirmation" class="form-label fw-semibold text-secondary">Xác nhận mật khẩu</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required style="border-radius: 8px; padding: 0.75rem;" placeholder="Nhập lại mật khẩu">
+                @error('password_confirmation')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="border-radius: 8px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Đăng ký</button>
+        </form>
+        
+        <p class="auth-link text-center mt-4 mb-0 text-muted" style="font-size: 0.9rem;">Đã có tài khoản? <a href="{{ route('login') }}" class="text-primary fw-bold text-decoration-none">Đăng nhập tại đây</a></p>
     </div>
-
 </div>
-
-</div>
-
 @endsection

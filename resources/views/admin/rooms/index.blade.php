@@ -1,127 +1,84 @@
 @extends('layouts.app')
 
-@section('title', 'Danh sách phòng')
-
 @section('content')
 
-<!-- Banner -->
-<section class="room-banner mb-5">
-    <div class="container text-center text-white">
-        <h1 class="fw-bold">Danh Sách Homestay</h1>
-        <p>Tìm kiếm nơi nghỉ dưỡng phù hợp cho chuyến đi của bạn</p>
+<h2>Quản lý phòng</h2>
+
+<div class="mb-4">
+    <a href="{{ route('admin.rooms.create') }}" class="btn btn-success">Thêm phòng mới</a>
+</div>
+
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
     </div>
-</section>
+@endif
 
-<!-- Search -->
-<section class="container mb-5">
-    <div class="search-box">
-        <div class="row g-3">
+<div class="row">
 
-            <div class="col-md-4">
-                <input type="text"
-                       class="form-control"
-                       placeholder="Tìm theo tên homestay">
-            </div>
+@foreach($rooms as $room)
 
-            <div class="col-md-3">
-                <input type="number"
-                       class="form-control"
-                       placeholder="Giá tối đa">
-            </div>
+<div class="col-lg-4 mb-4">
 
-            <div class="col-md-3">
-                <select class="form-select">
-                    <option>Tất cả trạng thái</option>
-                    <option>Available</option>
-                    <option>Occupied</option>
-                    <option>Maintenance</option>
-                </select>
-            </div>
+    <div class="card h-100">
 
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100">
-                    Tìm kiếm
-                </button>
-            </div>
+        <img src="{{ $room->thumbnail_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500' }}"
+             class="card-img-top" style="height: 200px; object-fit: cover;">
 
-        </div>
-    </div>
-</section>
+        <div class="card-body">
 
-<!-- Rooms -->
-<section class="container">
+            <h5>{{ $room->name }}</h5>
 
-    <div class="row">
+            <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ $room->address }}</p>
 
-        @foreach($rooms as $room)
+            <p>
+                <strong>Giá:</strong> {{ number_format($room->price) }} VNĐ / đêm
+            </p>
+            
+            <p>
+                <strong>Sức chứa:</strong> {{ $room->capacity }} người | 
+                <strong>Loại:</strong> 
+                @php
+                    $roomTypes = [
+                        'single' => 'Phòng đơn',
+                        'double' => 'Phòng đôi',
+                        'suite' => 'Phòng cao cấp (Suite)',
+                        'vip' => 'Phòng VIP',
+                        'family_suite' => 'Phòng Gia đình (Family Suite)'
+                    ];
+                @endphp
+                {{ $roomTypes[$room->type] ?? ucfirst($room->type) }}
+            </p>
 
-        <div class="col-lg-4 col-md-6 mb-4">
-
-            <div class="card room-card h-100">
-
-                <img src="{{ $room->thumbnail_url }}"
-                     class="card-img-top room-image"
-                     alt="{{ $room->name }}">
-
-                <div class="card-body">
-
-                    <h5 class="fw-bold">
-                        {{ $room->name }}
-                    </h5>
-
-                    <p class="text-primary fw-bold fs-5">
-                        {{ number_format($room->price) }} VNĐ / đêm
-                    </p>
-
-                    <p>
-                        📍 {{ $room->address }}
-                    </p>
-
-                    <p class="text-muted">
-                        {{ Str::limit($room->description,100) }}
-                    </p>
-
-                    @if($room->status == 'Available')
-
-                        <span class="badge bg-success">
-                            Còn phòng
-                        </span>
-
-                    @elseif($room->status == 'Occupied')
-
-                        <span class="badge bg-danger">
-                            Đã thuê
-                        </span>
-
-                    @else
-
-                        <span class="badge bg-warning">
-                            Bảo trì
-                        </span>
-
-                    @endif
-
-                    <div class="mt-3">
-
-                        <a href="/rooms/{{ $room->id }}"
-                           class="btn btn-primary w-100">
-
-                            Xem chi tiết
-
-                        </a>
-
-                    </div>
-
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <a href="{{ route('rooms.show', $room->id) }}"
+                   class="btn btn-outline-primary btn-sm">
+                    Xem
+                </a>
+                
+                <div>
+                    <a href="{{ route('admin.rooms.edit', $room->id) }}"
+                       class="btn btn-warning btn-sm">
+                        Sửa
+                    </a>
+                    
+                    <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phòng này?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
                 </div>
-
             </div>
 
         </div>
 
-        @endforeach
-
     </div>
 
-</section>
+</div>
+
+@endforeach
+
+</div>
+
 
 @endsection

@@ -1,226 +1,49 @@
 @extends('layouts.app')
 
-@section('title','Đăng nhập - CloudStay')
+@section('title', 'Đăng nhập - CloudStay')
 
 @section('content')
-
-<div class="login-page">
-
-```
-<div class="container">
-
-    <div class="row justify-content-center align-items-center min-vh-100">
-
-        <div class="col-lg-10">
-
-            <div class="login-card shadow-lg">
-
-                <div class="row g-0">
-
-
-                    <!-- LEFT CONTENT -->
-                    <div class="col-lg-6 login-banner">
-
-                        <div class="login-overlay"></div>
-
-                        <div class="login-info">
-
-                            <h1>
-                                CloudStay
-                            </h1>
-
-                            <h3>
-                                Tìm nơi nghỉ dưỡng
-                                hoàn hảo cho bạn
-                            </h3>
-
-                            <p>
-                                Đặt homestay nhanh chóng,
-                                an toàn và tiện lợi.
-                                Hàng nghìn địa điểm chờ bạn khám phá.
-                            </p>
-
-
-                            <div class="login-feature">
-
-                                <div>
-                                    🏡
-                                    <span>
-                                        Homestay chất lượng
-                                    </span>
-                                </div>
-
-
-                                <div>
-                                    🔒
-                                    <span>
-                                        Thanh toán an toàn
-                                    </span>
-                                </div>
-
-
-                                <div>
-                                    ⭐
-                                    <span>
-                                        Đánh giá uy tín
-                                    </span>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- RIGHT FORM -->
-                    <div class="col-lg-6 bg-white">
-
-                        <div class="login-form">
-
-
-                            <h2>
-                                Đăng nhập
-                            </h2>
-
-                            <p class="text-muted">
-                                Chào mừng bạn quay trở lại CloudStay
-                            </p>
-
-
-
-                            @if(session('error'))
-
-                            <div class="alert alert-danger">
-                                {{session('error')}}
-                            </div>
-
-                            @endif
-
-
-
-                            <form method="POST"
-                                  action="/login">
-
-                                @csrf
-
-
-                                <!-- Email -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Email
-                                    </label>
-
-
-                                    <input type="email"
-                                           name="email"
-                                           class="form-control"
-                                           placeholder="Nhập email"
-                                           required>
-
-                                </div>
-
-
-
-                                <!-- Password -->
-
-                                <div class="mb-3">
-
-                                    <label class="form-label">
-                                        Mật khẩu
-                                    </label>
-
-
-                                    <input type="password"
-                                           name="password"
-                                           class="form-control"
-                                           placeholder="Nhập mật khẩu"
-                                           required>
-
-                                </div>
-
-
-
-                                <div class="d-flex justify-content-between mb-3">
-
-                                    <div>
-                                        <input type="checkbox">
-                                        Ghi nhớ đăng nhập
-                                    </div>
-
-
-                                    <a href="#">
-                                        Quên mật khẩu?
-                                    </a>
-
-                                </div>
-
-
-
-                                <button class="btn btn-primary w-100">
-
-                                    Đăng nhập
-
-                                </button>
-
-
-                            </form>
-
-
-
-                            <!-- GOOGLE LOGIN -->
-
-                            <div class="text-center my-3">
-
-                                <span class="text-muted">
-                                    Hoặc
-                                </span>
-
-                            </div>
-
-
-                            <a href="/auth/google"
-                               class="btn btn-google w-100">
-
-                                <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png">
-
-                                Đăng nhập bằng Google
-
-                            </a>
-
-
-
-                            <p class="text-center mt-4">
-
-                                Chưa có tài khoản?
-
-                                <a href="/register">
-                                    Đăng ký ngay
-                                </a>
-
-                            </p>
-
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
+<div class="auth-container" style="max-width: 450px; margin: 4rem auto;">
+    <div class="auth-card" style="background: #f8fafc; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+        <h2 class="text-center fw-bold mb-4" style="color: #0f172a;">Đăng Nhập</h2>
+        
+        <form action="{{ route('login') }}" method="POST" class="auth-form bg-white p-4 rounded-3 border">
+            @csrf
+            
+            <div class="form-group mb-3 text-start">
+                <label for="email" class="form-label fw-semibold text-secondary">Địa chỉ Email</label>
+                <input type="email" id="email" name="email" class="form-control" required value="{{ old('email') }}" style="border-radius: 8px; padding: 0.75rem;">
+                @error('email')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
             </div>
-
-        </div>
-
-
+            
+            <div class="form-group mb-3 text-start">
+                <label for="password" class="form-label fw-semibold text-secondary">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control" required style="border-radius: 8px; padding: 0.75rem;">
+                @error('password')
+                    <span class="error text-danger" style="font-size: 0.85rem;">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group checkbox mb-4 d-flex align-items-center gap-2">
+                <input type="checkbox" id="remember" name="remember" class="form-check-input">
+                <label for="remember" class="form-check-label text-muted" style="font-size: 0.9rem;">Ghi nhớ đăng nhập</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3" style="border-radius: 8px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Đăng nhập</button>
+            
+            <div class="position-relative text-center my-4">
+                <hr class="text-muted">
+                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted" style="font-size: 0.85rem;">HOẶC</span>
+            </div>
+            
+            <a href="{{ route('auth.google') }}" class="btn btn-outline-danger w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2" style="border-radius: 8px; border-color: #ef4444; color: #ef4444; background: white; transition: all 0.3s;">
+                <i class="bi bi-google"></i> Đăng nhập bằng Google
+            </a>
+        </form>
+        
+        <p class="auth-link text-center mt-4 mb-0 text-muted" style="font-size: 0.9rem;">Chưa có tài khoản? <a href="{{ route('register') }}" class="text-primary fw-bold text-decoration-none">Đăng ký tại đây</a></p>
     </div>
-
 </div>
-```
-
-</div>
-
 @endsection

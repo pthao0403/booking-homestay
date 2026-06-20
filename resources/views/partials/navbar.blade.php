@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
 
         <a class="navbar-brand" href="/">
@@ -7,48 +7,40 @@
 
         <button class="navbar-toggler"
                 data-bs-toggle="collapse"
-                data-bs-target="#navbar">
-
+                data-bs-target="#menu">
             <span class="navbar-toggler-icon"></span>
-
         </button>
 
-        <div class="collapse navbar-collapse" id="navbar">
+        <div class="collapse navbar-collapse" id="menu">
 
-            <ul class="navbar-nav ms-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        Trang chủ
-                    </a>
-                </li>
+            <ul class="navbar-nav me-auto">
 
                 <li class="nav-item">
                     <a class="nav-link" href="/rooms">
-                        Danh sách phòng
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/booking">
-                        Đặt phòng
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">
-                        Đăng nhập
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="btn btn-primary ms-2"
-                       href="/register">
-                        Đăng ký
+                        Phòng
                     </a>
                 </li>
 
             </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                @auth
+                    <span class="text-white me-2">Chào, <strong>{{ Auth::user()->name }}</strong></span>
+                    <a href="{{ route('bookings.index') }}" class="btn btn-outline-light btn-sm">Lịch sử đặt phòng</a>
+                    
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">Quản trị</a>
+                    @endif
+
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm">Đăng xuất</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-light btn-sm">Đăng nhập</a>
+                    <a href="{{ route('register') }}" class="btn btn-warning btn-sm">Đăng ký</a>
+                @endauth
+            </div>
 
         </div>
 
