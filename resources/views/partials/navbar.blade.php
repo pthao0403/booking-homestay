@@ -23,18 +23,23 @@
 
             </ul>
 
-            <div>
+            <div class="d-flex align-items-center gap-2">
+                @auth
+                    <span class="text-white me-2">Chào, <strong>{{ Auth::user()->name }}</strong></span>
+                    <a href="{{ route('bookings.index') }}" class="btn btn-outline-light btn-sm">Lịch sử đặt phòng</a>
+                    
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">Quản trị</a>
+                    @endif
 
-                <a href="/login"
-                   class="btn btn-light btn-sm">
-                    Đăng nhập
-                </a>
-
-                <a href="/register"
-                   class="btn btn-warning btn-sm">
-                    Đăng ký
-                </a>
-
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm">Đăng xuất</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-light btn-sm">Đăng nhập</a>
+                    <a href="{{ route('register') }}" class="btn btn-warning btn-sm">Đăng ký</a>
+                @endauth
             </div>
 
         </div>
