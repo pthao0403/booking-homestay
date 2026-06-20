@@ -10,10 +10,7 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+
 
     /**
      * Display a listing of the user's bookings.

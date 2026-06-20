@@ -8,21 +8,15 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (auth()->check() && auth()->user()->role === 'admin') {
-                return $next($request);
-            }
-            abort(403, 'Bạn không có quyền truy cập trang quản trị này.');
-        });
-    }
-
     /**
      * Display a listing of all bookings.
      */
     public function index(Request $request)
     {
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Bạn không có quyền truy cập trang quản trị này.');
+        }
+
         $query = Booking::with(['user', 'room'])->latest();
 
         if ($request->filled('status')) {
@@ -39,6 +33,10 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Bạn không có quyền truy cập trang quản trị này.');
+        }
+
         $request->validate([
             'status' => ['required', 'in:confirmed,cancelled,completed,pending']
         ]);
