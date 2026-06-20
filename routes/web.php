@@ -66,9 +66,42 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
 })->name('admin.dashboard');
 
-// Placeholder for profile
-Route::get('/profile', function () {
-    return 'Trang cá nhân';
-})->name('profile.index');
+// Profile Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', function () {
+        return view('profile.index');
+    })->name('profile.index');
+
+    Route::put('/profile', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
+        ]);
+
+        auth()->user()->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        return back()->with('success', 'Cập nhật thông tin thành công!');
+    })->name('profile.update');
+
+    Route::post('/profile/change-password', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if (auth()->user()->password && !\Illuminate\Support\Facades\Hash::check($request->current_password, auth()->user()->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.']);
+        }
+
+        auth()->user()->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
+        ]);
+
+        return back()->with('success', 'Đổi mật khẩu thành công!');
+    })->name('profile.change-password');
+});
 
 
