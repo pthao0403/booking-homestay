@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\AuthController;
@@ -11,10 +12,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 // Home Page
-Route::get('/', function () {
-    return redirect()->route('rooms.index');
-})->name('home');
-
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
+    
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
