@@ -1,122 +1,51 @@
 <footer class="bg-dark text-white mt-5">
-
-<div class="container py-5">
-
-    <div class="row">
-
-        <!-- CloudStay -->
-        <div class="col-lg-4 mb-4">
-
-            <h4 class="fw-bold text-primary">
-                CloudStay
-            </h4>
-
-            <p class="text-light">
-                Nền tảng đặt homestay trực tuyến giúp khách hàng
-                tìm kiếm, đặt phòng và quản lý booking một cách
-                nhanh chóng, tiện lợi và an toàn.
-            </p>
-
-        </div>
-
-        <!-- Liên kết -->
-        <div class="col-lg-2 col-md-4 mb-4">
-
-            <h5 class="fw-bold">
-                Liên kết
-            </h5>
-
-            <ul class="list-unstyled">
-
-                <li>
-                    <a href="/"
-                       class="text-decoration-none text-light">
-                        Trang chủ
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/rooms"
-                       class="text-decoration-none text-light">
-                        Homestay
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/booking"
-                       class="text-decoration-none text-light">
-                        Đặt phòng
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-
-        <!-- Hỗ trợ -->
-        <div class="col-lg-3 col-md-4 mb-4">
-
-            <h5 class="fw-bold">
-                Hỗ trợ
-            </h5>
-
-            <ul class="list-unstyled">
-
-                <li>Email: support@cloudstay.com</li>
-
-                <li>Hotline: 1900 1234</li>
-
-                <li>Hỗ trợ 24/7</li>
-
-            </ul>
-
-        </div>
-
-        <!-- Mạng xã hội -->
-        <div class="col-lg-3 col-md-4 mb-4">
-
-            <h5 class="fw-bold">
-                Theo dõi chúng tôi
-            </h5>
-
-            <div class="d-flex gap-3 fs-4">
-
-                <a href="#"
-                   class="text-white">
-                    <i class="bi bi-facebook"></i>
-                </a>
-
-                <a href="#"
-                   class="text-white">
-                    <i class="bi bi-instagram"></i>
-                </a>
-
-                <a href="#"
-                   class="text-white">
-                    <i class="bi bi-youtube"></i>
-                </a>
-
-                <a href="#"
-                   class="text-white">
-                    <i class="bi bi-tiktok"></i>
-                </a>
-
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h4 class="fw-bold text-primary">CloudStay</h4>
+                <p class="text-light mb-0">
+                    Nền tảng đặt homestay trực tuyến giúp tìm phòng, đặt phòng và theo dõi lịch lưu trú trong một luồng đơn giản.
+                </p>
             </div>
 
+            <div class="col-lg-2 col-md-4">
+                <h5 class="fw-bold">Điều hướng</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="{{ route('home') }}" class="text-decoration-none text-light">Trang chủ</a></li>
+                    <li><a href="{{ route('rooms.index') }}" class="text-decoration-none text-light">Homestay</a></li>
+                    @auth
+                        <li><a href="{{ route('bookings.index') }}" class="text-decoration-none text-light">Booking của tôi</a></li>
+                    @endauth
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <h5 class="fw-bold">Hỗ trợ</h5>
+                <ul class="list-unstyled mb-0">
+                    <li>Email: support@cloudstay.com</li>
+                    <li>Hotline: 1900 1234</li>
+                    <li>Hỗ trợ 24/7</li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-4">
+                <h5 class="fw-bold">Liên kết nhanh</h5>
+                <div class="d-flex flex-column gap-2">
+                    <a href="{{ route('login') }}" class="text-decoration-none text-light">Đăng nhập</a>
+                    @auth
+                        <a href="{{ route('profile.index') }}" class="text-decoration-none text-light">Tài khoản</a>
+                        @if (auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-light">Dashboard admin</a>
+                        @endif
+                    @endauth
+                </div>
+            </div>
         </div>
 
+        <hr class="border-secondary">
+
+        <div class="text-center">
+            <small>&copy; {{ date('Y') }} CloudStay. Đã đăng ký mọi quyền.</small>
+        </div>
     </div>
-
-    <hr class="border-secondary">
-
-    <div class="text-center">
-
-        <small>
-            © {{ date('Y') }} CloudStay.
-            All Rights Reserved.
-        </small>
-
-    </div>
-
-</div>
 </footer>

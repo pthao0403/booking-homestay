@@ -12,7 +12,7 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Room::query();
+        $query = Room::query()->with('images');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -25,8 +25,8 @@ class RoomController extends Controller
 
         // Only show available rooms for booking by default
         $rooms = $query->where('status', 'available')
-                      ->paginate(9)
-                      ->withQueryString();
+            ->paginate(9)
+            ->withQueryString();
 
         if ($request->expectsJson()) {
             return response()->json($rooms);
@@ -40,10 +40,23 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
+        $room->load('images');
+
+        $similarRooms = Room::query()
+            ->where('status', 'available')
+            ->whereKeyNot($room->id)
+            ->where(function ($query) use ($room) {
+                $query->where('type', $room->type)
+                    ->orWhere('address', 'like', '%' . $room->address . '%');
+            })
+            ->take(3)
+            ->get();
+
         if (request()->expectsJson()) {
             return response()->json($room);
         }
-        return view('rooms.show', compact('room'));
+
+        return view('rooms.show', compact('room', 'similarRooms'));
     }
 
     /**

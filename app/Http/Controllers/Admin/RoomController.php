@@ -39,6 +39,7 @@ class RoomController extends Controller
             'location' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
+            'status' => 'required|string|in:available,occupied,maintenance',
             'capacity' => 'required|integer|min:1',
             'type' => 'required|string|in:single,double,suite,vip,family_suite',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -50,9 +51,9 @@ class RoomController extends Controller
         $room->address = $data['location']; // maps to address
         $room->price = $data['price_per_night']; // maps to price
         $room->description = $data['description'];
+        $room->status = $data['status'];
         $room->capacity = $data['capacity'];
         $room->type = $data['type'];
-        $room->status = 'available';
 
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('rooms', 'public');
@@ -103,6 +104,7 @@ class RoomController extends Controller
             'location' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
+            'status' => 'required|string|in:available,occupied,maintenance',
             'capacity' => 'required|integer|min:1',
             'type' => 'required|string|in:single,double,suite,vip,family_suite',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -113,6 +115,7 @@ class RoomController extends Controller
         $room->address = $data['location'];
         $room->price = $data['price_per_night'];
         $room->description = $data['description'];
+        $room->status = $data['status'];
         $room->capacity = $data['capacity'];
         $room->type = $data['type'];
 

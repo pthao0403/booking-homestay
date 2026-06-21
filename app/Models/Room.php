@@ -18,7 +18,8 @@ class Room extends Model
         'thumbnail_url',
         'status',
         'capacity',
-        'type'
+        'type',
+        'is_featured',
     ];
 
     /**

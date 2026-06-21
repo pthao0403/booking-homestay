@@ -13,9 +13,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        // Current route for '/' redirects to the rooms index.
-        $response->assertStatus(302);
-        $response->assertRedirect(route('rooms.index'));
+        $response->assertOk();
+        $response->assertSee('CloudStay');
     }
 }
-
