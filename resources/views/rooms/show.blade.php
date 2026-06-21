@@ -11,7 +11,25 @@
     
     <div class="room-detail-content">
         <div class="room-images" style="margin-bottom: 2rem;">
-            <img src="{{ $room->thumbnail_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500' }}" alt="{{ $room->name }}" style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px;">
+            @php
+                $thumb = $room->thumbnail_url;
+                $fallback = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
+
+                $thumbUrl = null;
+                if ($thumb) {
+                    if (is_string($thumb) && str_contains($thumb, '/storage/')) {
+                        $filenamePath = preg_replace('#^.*?/storage/#', '', $thumb);
+                        $thumbUrl = "https://storage.googleapis.com/booking-homstay/{$filenamePath}";
+                    } else {
+                        try {
+                            $thumbUrl = \Illuminate\Support\Facades\Storage::disk('gcs')->url($thumb);
+                        } catch (\Throwable $e) {
+                            $thumbUrl = $thumb;
+                        }
+                    }
+                }
+            @endphp
+            <img src="{{ $thumbUrl ?: $fallback }}" alt="{{ $room->name }}" style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px;">
         </div>
 
         @include('rooms.gallery')

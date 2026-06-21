@@ -31,7 +31,7 @@ class RoomImageSignedUrlController extends Controller
         }
 
         $projectId = config('filesystems.disks.gcs.project_id') ?? env('GCS_PROJECT_ID');
-        $keyFilePath = config('filesystems.disks.gcs.key_file') ?? env('GCS_KEY_FILE');
+        $keyFilePath = config('filesystems.disks.gcs.key_file_path') ?? env('GCS_KEY_FILE');
         $bucketName = config('filesystems.disks.gcs.bucket') ?? env('GCS_BUCKET');
 
         if (!$projectId || !$keyFilePath || !$bucketName) {

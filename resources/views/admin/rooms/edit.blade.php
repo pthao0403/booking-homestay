@@ -72,8 +72,19 @@
             <div class="form-group">
                 <label for="thumbnail">Tải lên ảnh mới từ máy tính (Thumbnail)</label>
                 @if($room->thumbnail_url)
+                    @php
+                        $thumbnailPreview = $room->thumbnail_url;
+
+                        if ($thumbnailPreview && !str_starts_with($thumbnailPreview, 'http')) {
+                            $gcsBaseUrl = rtrim((string) config('filesystems.disks.gcs.url'), '/');
+
+                            if ($gcsBaseUrl !== '') {
+                                $thumbnailPreview = $gcsBaseUrl . '/' . ltrim($thumbnailPreview, '/');
+                            }
+                        }
+                    @endphp
                     <div class="mb-2">
-                        <img src="{{ $room->thumbnail_url }}" alt="Current Image" style="height: 100px; border-radius: 4px; object-fit: cover;">
+                        <img src="{{ $thumbnailPreview }}" alt="Current Image" style="height: 100px; border-radius: 4px; object-fit: cover;">
                     </div>
                 @endif
                 <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
@@ -128,14 +139,16 @@
                     </div>
                 </div>
 
-                <script>
+                <script data-room-id="{{ $room->id }}">
                     (function () {
+                        const roomId = Number(document.currentScript?.dataset.roomId || 0);
+
                         async function loadSignedUrl(img) {
                             const path = img.dataset.path;
                             if (!path) return;
 
                             try {
-                                const url = new URL(window.location.origin + '/admin/rooms/' + @json($room->id) + '/images/signed-url');
+                                const url = new URL(window.location.origin + '/admin/rooms/' + roomId + '/images/signed-url');
                                 url.searchParams.set('path', path);
 
                                 const res = await fetch(url.toString(), {
