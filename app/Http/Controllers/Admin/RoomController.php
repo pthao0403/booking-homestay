@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('admin');
-    }
+
+
 
     /**
      * Display a listing of rooms.
@@ -25,7 +23,7 @@ class RoomController extends Controller
             return response()->json($rooms);
         }
         return view('admin.rooms.index', compact('rooms'));
-    }
+    }   
 
     /**
      * Show the form for creating a new room.

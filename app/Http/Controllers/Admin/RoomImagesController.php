@@ -44,5 +44,39 @@ class RoomImagesController extends Controller
 
         return back()->with('success', 'Upload ảnh thành công.');
     }
+
+    /**
+     * DELETE /admin/rooms/{room}/images/{image}
+     */
+    public function destroy(Request $request, Room $room, RoomImage $image)
+    {
+        // Ensure image belongs to the room
+        if ($image->room_id !== $room->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image does not belong to this room.',
+            ], 422);
+        }
+
+        $objectPath = $image->image_url;
+
+        try {
+            Storage::disk('gcs')->delete($objectPath);
+        } catch (\Throwable $e) {
+            // continue deleting db record
+        }
+
+        $image->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Deleted successfully.',
+            ]);
+        }
+
+        return back()->with('success', 'Xóa ảnh phòng thành công.');
+    }
 }
+
 

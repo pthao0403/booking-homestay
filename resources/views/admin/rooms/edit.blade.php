@@ -97,6 +97,68 @@
                 <input type="file" id="images" name="images[]" accept="image/*" multiple>
             </div>
 
+            {{-- Gallery + Delete actions --}}
+            @php
+                $images = $room->images()->get();
+            @endphp
+
+            @if($images->count() > 0)
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <h3 style="margin: 0 0 0.75rem;">Danh sách ảnh phòng</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
+                        @foreach($images as $img)
+                            <div style="border-radius: 8px; overflow: hidden; background: #f2f2f2; position: relative;">
+                                <img
+                                    class="room-gallery-img"
+                                    data-path="{{ $img->image_url }}"
+                                    src=""
+                                    alt="{{ $room->name }}"
+                                    style="width: 100%; height: 140px; object-fit: cover; display:block;"
+                                />
+
+                                <form method="POST" action="{{ route('admin.rooms.images.destroy', [$room, $img]) }}"
+                                      onsubmit="return confirm('Xóa ảnh này?');"
+                                      style="position:absolute; top:8px; right:8px;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <script>
+                    (function () {
+                        async function loadSignedUrl(img) {
+                            const path = img.dataset.path;
+                            if (!path) return;
+
+                            try {
+                                const url = new URL(window.location.origin + '/admin/rooms/' + @json($room->id) + '/images/signed-url');
+                                url.searchParams.set('path', path);
+
+                                const res = await fetch(url.toString(), {
+                                    method: 'GET',
+                                    headers: { 'Accept': 'application/json' }
+                                });
+
+                                const data = await res.json();
+                                if (data && data.success && data.url) {
+                                    img.src = data.url;
+                                }
+                            } catch (e) {
+                                // keep empty
+                            }
+                        }
+
+                        document.querySelectorAll('.room-gallery-img').forEach(function (img) {
+                            loadSignedUrl(img);
+                        });
+                    })();
+                </script>
+            @endif
+
             <button type="submit" formaction="{{ route('admin.rooms.update', $room) }}" class="btn btn-primary">Cập nhật</button>
             <button type="submit" formaction="{{ route('admin.rooms.images.store', $room) }}" class="btn btn-success">Upload ảnh</button>
             <a href="{{ route('admin.rooms.index') }}" class="btn btn-secondary">Hủy bỏ</a>
