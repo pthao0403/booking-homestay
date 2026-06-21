@@ -60,11 +60,13 @@ return [
             'report' => false,
         ],
 
+
         'gcs' => [
             'driver' => 'gcs',
             'project_id' => env('GCS_PROJECT_ID'),
             'key_file' => env('GCS_KEY_FILE'),
-            'bucket' => env('GCS_BUCKET'),
+            'bucket' => env('GCS_BUCKET', 'booking-homstay'),
+            'url' => env('GCS_URL'),
             'visibility' => 'private',
             // 'url' => env('GCS_URL'), // optional
             'throw' => false,
