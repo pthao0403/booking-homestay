@@ -13,9 +13,14 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        // Current route for '/' redirects to the rooms index.
-        $response->assertStatus(302);
-        $response->assertRedirect(route('rooms.index'));
+        $response->assertOk();
+        $response->assertSee('CloudStay');
+    }
+
+    public function test_rooms_api_returns_a_successful_response(): void
+    {
+        $response = $this->get('/api/rooms');
+
+        $response->assertOk();
     }
 }
-
