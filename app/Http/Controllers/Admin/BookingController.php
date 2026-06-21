@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('admin');
+    }
+
     /**
      * Display a listing of all bookings.
      */

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 // Home Page
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
-    
+
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -43,38 +43,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 });
 
-// Admin Room CRUD Routes
-Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
+// Admin Authentication Routes
+Route::get('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'showLogin'])->name('admin.login');
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'login'])->name('admin.login.post');
+Route::post('/admin/logout', [\App\Http\Controllers\Admin\AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Admin Room Images Upload
-Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
-    ->name('admin.rooms.images.store');
+// Protected Admin Routes
+Route::middleware(['auth'])->group(function () {
+    // Admin Dashboard Route
+    Route::get('/admin/dashboard', function () {
+        $totalRooms = Room::count();
+        $totalUsers = User::count();
+        try {
+            $totalBookings = DB::table('bookings')->count();
+            $revenue = DB::table('bookings')->where('status', 'confirmed')->sum('total_price');
+        } catch (\Exception $e) {
+            $totalBookings = 0;
+            $revenue = 0;
+        }
 
+        // Format revenue as VNĐ
+        $revenue = number_format($revenue) . ' VNĐ';
 
+        return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
+    })->name('admin.dashboard');
 
+    // Admin Room CRUD Routes
+    Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
 
+    // Admin Room Images Upload
+    Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
+        ->name('admin.rooms.images.store');
 
-// Admin Booking Management Routes
-Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
-Route::put('/admin/bookings/{booking}', [AdminBookingController::class, 'update'])->name('admin.bookings.update');
+    // Admin Booking Management Routes
+    Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::put('/admin/bookings/{booking}', [AdminBookingController::class, 'update'])->name('admin.bookings.update');
+});
 
-// Admin Dashboard Route
-Route::get('/admin/dashboard', function () {
-    $totalRooms = Room::count();
-    $totalUsers = User::count();
-    try {
-        $totalBookings = DB::table('bookings')->count();
-        $revenue = DB::table('bookings')->where('status', 'confirmed')->sum('total_price');
-    } catch (\Exception $e) {
-        $totalBookings = 0;
-        $revenue = 0;
-    }
-    
-    // Format revenue as VNĐ
-    $revenue = number_format($revenue) . ' VNĐ';
-    
-    return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
-})->name('admin.dashboard');
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
