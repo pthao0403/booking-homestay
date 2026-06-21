@@ -65,6 +65,7 @@ return [
             'project_id' => env('GCS_PROJECT_ID'),
             'key_file' => env('GCS_KEY_FILE'),
             'bucket' => env('GCS_BUCKET'),
+            'visibility' => 'private',
             // 'url' => env('GCS_URL'), // optional
             'throw' => false,
             'report' => false,

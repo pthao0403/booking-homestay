@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
+use Google\Cloud\Storage\StorageClient;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class RoomImageSignedUrlController extends Controller
 {
     /**
-     * Trả signed URL cho image path trong GCS
      * GET /admin/rooms/{room}/images/signed-url?path=rooms/{roomId}/{filename}
      */
     public function signedUrl(Request $request, Room $room)
@@ -20,18 +20,55 @@ class RoomImageSignedUrlController extends Controller
             'path' => 'required|string',
         ]);
 
-        $expiresAt = now()->addMinutes(15);
-        $disk = Storage::disk('gcs');
+        $path = ltrim($path, '/');
 
-        // Flysystem driver may support temporaryUrl for GCS depending on configuration.
-        // If not supported, we return empty and UI should handle fallback.
+        // basic sanity
+        if (!Str::startsWith($path, 'rooms/')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid object path.',
+            ], 422);
+        }
+
+        $projectId = config('filesystems.disks.gcs.project_id') ?? env('GCS_PROJECT_ID');
+        $keyFilePath = config('filesystems.disks.gcs.key_file') ?? env('GCS_KEY_FILE');
+        $bucketName = config('filesystems.disks.gcs.bucket') ?? env('GCS_BUCKET');
+
+        if (!$projectId || !$keyFilePath || !$bucketName) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing GCS env/config (GCS_PROJECT_ID, GCS_KEY_FILE, GCS_BUCKET).',
+            ], 500);
+        }
+
+        $expiresAt = now()->addMinutes(15);
+
+        $storage = new StorageClient([
+            'projectId' => $projectId,
+            'keyFilePath' => $keyFilePath,
+        ]);
+
+        $bucket = $storage->bucket($bucketName);
+        $object = $bucket->object($path);
+
+        if (!$object) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Object not found.',
+            ], 404);
+        }
 
         try {
-            // Some Flysystem adapters may not implement temporaryUrl.
-            $url = method_exists($disk, 'temporaryUrl') ? $disk->temporaryUrl($path, $expiresAt) : null;
-
+            $url = $object->signedUrl($expiresAt, [
+                'version' => 'v4',
+                'method' => 'GET',
+            ]);
         } catch (\Throwable $e) {
-            $url = null;
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not create signed URL.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
 
         return response()->json([
@@ -40,4 +77,5 @@ class RoomImageSignedUrlController extends Controller
         ]);
     }
 }
+
 
