@@ -9,7 +9,9 @@
     <div class="admin-content">
         <h1>Sửa thông tin phòng</h1>
         
+        
         <form action="{{ route('admin.rooms.update', $room) }}" method="POST" class="form" enctype="multipart/form-data">
+
             @csrf
             @method('PUT')
             
@@ -88,8 +90,17 @@
                 @enderror
             </div>
             
-            <button type="submit" class="btn btn-primary">Cập nhật</button>
+            <hr style="margin: 1.5rem 0;" />
+
+            <div class="form-group">
+                <label for="images">Tải lên ảnh phòng (nhiều ảnh)</label>
+                <input type="file" id="images" name="images[]" accept="image/*" multiple>
+            </div>
+
+            <button type="submit" formaction="{{ route('admin.rooms.update', $room) }}" class="btn btn-primary">Cập nhật</button>
+            <button type="submit" formaction="{{ route('admin.rooms.images.store', $room) }}" class="btn btn-success">Upload ảnh</button>
             <a href="{{ route('admin.rooms.index') }}" class="btn btn-secondary">Hủy bỏ</a>
+
         </form>
     </div>
 </div>

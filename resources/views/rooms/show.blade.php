@@ -13,6 +13,9 @@
         <div class="room-images" style="margin-bottom: 2rem;">
             <img src="{{ $room->thumbnail_url ?: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500' }}" alt="{{ $room->name }}" style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px;">
         </div>
+
+        @include('rooms.gallery')
+
         
         <div class="room-details">
             <h2>Thông tin chi tiết</h2>

@@ -6,9 +6,11 @@ use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\RoomImagesController;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 // Home Page
 Route::get('/', function () {
@@ -44,6 +46,14 @@ Route::middleware('auth')->group(function () {
 // Admin Room CRUD Routes
 Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
 
+// Admin Room Images Upload
+Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
+    ->name('admin.rooms.images.store');
+
+
+
+
+
 // Admin Booking Management Routes
 Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
 Route::put('/admin/bookings/{booking}', [AdminBookingController::class, 'update'])->name('admin.bookings.update');
@@ -75,10 +85,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', function (\Illuminate\Http\Request $request) {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
+            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
         ]);
 
-        auth()->user()->update([
+        Auth::user()->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
@@ -92,11 +102,11 @@ Route::middleware('auth')->group(function () {
             'new_password' => 'required|string|min:6|confirmed',
         ]);
 
-        if (auth()->user()->password && !\Illuminate\Support\Facades\Hash::check($request->current_password, auth()->user()->password)) {
+        if (Auth::user()->password && !\Illuminate\Support\Facades\Hash::check($request->current_password, Auth::user()->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.']);
         }
 
-        auth()->user()->update([
+        Auth::user()->update([
             'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
         ]);
 

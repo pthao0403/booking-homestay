@@ -1,0 +1,3 @@
+- [ ] Fix IDE báo đỏ trong routes/web.php (intelephense undefined method cho auth()->id()/user())
+- [ ] Kiểm tra lại route upload ảnh hiển thị đúng
+- [ ] Chạy php artisan test và route:list để xác nhận không lỗi
