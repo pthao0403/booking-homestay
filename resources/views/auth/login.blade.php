@@ -32,6 +32,10 @@
             </div>
             
             <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3" style="border-radius: 8px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Đăng nhập</button>
+
+            <a href="{{ route('admin.login') }}" class="btn btn-outline-dark w-100 py-2 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 8px; border-color: #111827; color: #111827; background: white; transition: all 0.3s;">
+                <i class="bi bi-shield-lock me-2"></i> Đăng nhập Admin
+            </a>
             
             <div class="position-relative text-center my-4">
                 <hr class="text-muted">
