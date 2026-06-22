@@ -9,12 +9,27 @@ use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
-    public function index()
+    // ĐÃ SỬA: Thêm Request $request vào hàm index
+    public function index(Request $request)
     {
-        $rooms = Room::all();
-        if (request()->expectsJson()) {
+        $query = Room::query();
+
+        // Xử lý tìm kiếm (Nếu có từ khóa thì lọc theo name hoặc address)
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('address', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Lấy dữ liệu với phân trang (nên dùng paginate thay vì all để web mượt hơn)
+        $rooms = $query->paginate(10)->withQueryString();
+
+        if ($request->expectsJson()) {
             return response()->json($rooms);
         }
+        
         return view('admin.rooms.index', compact('rooms'));
     }
 
@@ -54,7 +69,7 @@ class RoomController extends Controller
             $folderPath = 'rooms/' . $room->id . '/thumbnail';
 
             try {
-                $storedPath = Storage::disk('public')->putFileAs(
+                $storedPath = Storage::disk('gcs')->putFileAs(
                     $folderPath,
                     $thumbnail,
                     $filename,
@@ -65,16 +80,14 @@ class RoomController extends Controller
                     throw new \RuntimeException('Unable to store thumbnail.');
                 }
 
-                $room->thumbnail_url = Storage::disk('public')->url($storedPath);
+                $room->thumbnail_url = Storage::disk('gcs')->url($storedPath);
                 $room->save();
             } catch (\Throwable $e) {
                 $room->delete();
-
                 return back()
                     ->withInput()
                     ->withErrors(['thumbnail' => 'Không thể tải ảnh: ' . $e->getMessage()]);
             }
-
         } elseif ($request->filled('thumbnail_url')) {
             $room->thumbnail_url = $data['thumbnail_url'];
             $room->save();
@@ -122,21 +135,20 @@ class RoomController extends Controller
         $room->type = $data['type'];
 
         if ($request->hasFile('thumbnail')) {
-            // Xóa ảnh cũ nếu có
+            // Xóa ảnh cũ nếu có trên GCS
             if ($room->thumbnail_url) {
-                $oldPath = str_replace('/storage/', '', parse_url($room->thumbnail_url, PHP_URL_PATH));
-                if (Storage::disk('public')->exists($oldPath)) {
-                    Storage::disk('public')->delete($oldPath);
-                }
+                $oldPath = str_replace('booking-homstay/', '', parse_url($room->thumbnail_url, PHP_URL_PATH));
+                $oldPath = ltrim($oldPath, '/');
+                Storage::disk('gcs')->delete($oldPath);
             }
 
             $extension = $request->file('thumbnail')->getClientOriginalExtension();
             $filename = uniqid('room_thumb_', true) . '.' . $extension;
             $folderPath = 'rooms/' . $room->id . '/thumbnail';
             
-            // Upload ảnh mới
-            $storedPath = $request->file('thumbnail')->storeAs($folderPath, $filename, 'public');
-            $room->thumbnail_url = Storage::disk('public')->url($storedPath);
+            // Upload ảnh mới lên GCS
+            $request->file('thumbnail')->storeAs($folderPath, $filename, 'gcs');
+            $room->thumbnail_url = Storage::disk('gcs')->url($folderPath . '/' . $filename);
             
         } elseif ($request->filled('thumbnail_url')) {
             $room->thumbnail_url = $data['thumbnail_url'];
@@ -157,12 +169,12 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
-        // Xóa ảnh cũ nếu có
+        // Xóa ảnh cũ nếu có trên GCS
         if ($room->thumbnail_url) {
-            $oldPath = str_replace('/storage/', '', parse_url($room->thumbnail_url, PHP_URL_PATH));
-            if (Storage::disk('public')->exists($oldPath)) {
-                Storage::disk('public')->delete($oldPath);
-            }
+            $oldPath = str_replace('booking-homstay/', '', parse_url($room->thumbnail_url, PHP_URL_PATH));
+            $oldPath = ltrim($oldPath, '/');
+            Storage::disk('gcs')->delete($oldPath);
+        }
         }
 
         $room->delete();

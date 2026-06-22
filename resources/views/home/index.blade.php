@@ -85,39 +85,44 @@
 
     <div class="card border-0 shadow-lg p-4">
 
-        <div class="row g-3">
+        <form action="{{ route('rooms.index') }}" method="GET">
+            <div class="row g-3">
 
-            <div class="col-md-4">
+                <div class="col-md-4">
 
-                <input type="text"
-                       class="form-control"
-                       placeholder="Bạn muốn đi đâu?">
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Bạn muốn đi đâu?">
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <input type="date"
+                           name="check_in"
+                           class="form-control">
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <input type="date"
+                           name="check_out"
+                           class="form-control">
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Tìm kiếm
+                    </button>
+
+                </div>
 
             </div>
-
-            <div class="col-md-3">
-
-                <input type="date"
-                       class="form-control">
-
-            </div>
-
-            <div class="col-md-3">
-
-                <input type="date"
-                       class="form-control">
-
-            </div>
-
-            <div class="col-md-2">
-
-                <button class="btn btn-primary w-100">
-                    Tìm kiếm
-                </button>
-
-            </div>
-
-        </div>
+        </form>
 
     </div>
 </section>

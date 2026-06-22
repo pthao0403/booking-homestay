@@ -13,6 +13,17 @@
       0 => 'Laravel\\Sail\\SailServiceProvider',
     ),
   ),
+  'laravel/socialite' => 
+  array (
+    'aliases' => 
+    array (
+      'Socialite' => 'Laravel\\Socialite\\Facades\\Socialite',
+    ),
+    'providers' => 
+    array (
+      0 => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    ),
+  ),
   'laravel/tinker' => 
   array (
     'providers' => 
@@ -39,6 +50,28 @@
     'providers' => 
     array (
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    ),
+  ),
+  'spatie/laravel-google-calendar' => 
+  array (
+    'aliases' => 
+    array (
+      'GoogleCalendar' => 'Spatie\\GoogleCalendar\\GoogleCalendarFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\GoogleCalendar\\GoogleCalendarServiceProvider',
+    ),
+  ),
+  'spatie/laravel-google-cloud-storage' => 
+  array (
+    'aliases' => 
+    array (
+      'GoogleCloudStorage' => 'Spatie\\GoogleCloudStorage\\GoogleCloudStorageFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\GoogleCloudStorage\\GoogleCloudStorageServiceProvider',
     ),
   ),
 );
