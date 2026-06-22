@@ -17,10 +17,12 @@
     --dark-text: #1f2937;
     --border-color: #e5e7eb;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --font-body: 'Be Vietnam Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-body);
     line-height: 1.6;
     color: var(--dark-text);
     background-color: #fff;
@@ -57,6 +59,8 @@ html, body {
     font-weight:800;
     color:#818cf8!important;
     text-decoration: none;
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
 }
 
 .navbar-menu {
