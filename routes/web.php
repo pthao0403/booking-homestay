@@ -75,11 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
         ->name('admin.rooms.images.store');
 
-    // Signed URL for room images
-    Route::get('admin/rooms/{room}/images/signed-url', [\App\Http\Controllers\Admin\RoomImageSignedUrlController::class, 'signedUrl'])
-        ->name('admin.rooms.images.signed-url');
-
-    // Delete a room image (GCS + DB)
+    // Delete a room image
     Route::delete('admin/rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\RoomImagesController::class, 'destroy'])
         ->name('admin.rooms.images.destroy');
 

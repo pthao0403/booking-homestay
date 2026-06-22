@@ -60,21 +60,6 @@ return [
             'report' => false,
         ],
 
-
-        'gcs' => [
-            'driver' => 'gcs',
-            'project_id' => env('GCS_PROJECT_ID'),
-            'bucket' => env('GCS_BUCKET'),
-            'url' => env('GCS_URL'),
-            'key_file_path' => env('GCS_KEY_FILE'), // Trỏ đúng tên biến trong file .env của bạn
-            'path_prefix' => '',
-            'storage_api_uri' => null,
-            'apiEndpoint' => null,
-            'visibility' => 'public',
-            // Dòng này cực kỳ quan trọng để không bị lỗi phân quyền trên Google Cloud:
-            'visibility_handler' => \League\Flysystem\GoogleCloudStorage\UniformBucketLevelAccessVisibility::class,
-        ],
-
     ],
 
     /*
