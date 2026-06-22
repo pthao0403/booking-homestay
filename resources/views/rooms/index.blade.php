@@ -21,24 +21,10 @@
             
             <div class="room-card">
                 @php
-                    $thumb = $room->thumbnail_url;
                     $fallback = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
-
-                    $thumbUrl = null;
-                    if ($thumb) {
-                        if (is_string($thumb) && str_contains($thumb, '/storage/')) {
-                            $filenamePath = preg_replace('#^.*?/storage/#', '', $thumb);
-                            $thumbUrl = "https://storage.googleapis.com/booking-homstay/{$filenamePath}";
-                        } else {
-                            try {
-                                $thumbUrl = \Illuminate\Support\Facades\Storage::disk('gcs')->url($thumb);
-                            } catch (\Throwable $e) {
-                                $thumbUrl = $thumb;
-                            }
-                        }
-                    }
+                    $thumbUrl = $room->thumbnail_url ?: $fallback;
                 @endphp
-                <div class="room-image" style="background-image: url('{{ $thumbUrl ?: $fallback }}'); background-size: cover; background-position: center; height: 200px;">
+                <div class="room-image" style="background-image: url('{{ $thumbUrl }}'); background-size: cover; background-position: center; height: 200px;">
                     {{-- Room image --}}
                 </div>
                 <div class="room-info">
