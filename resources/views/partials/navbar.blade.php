@@ -21,6 +21,11 @@
                         Chào, <strong>{{ Auth::user()->name }}</strong>
                     </span>
 
+                    <a href="{{ route('dashboard') }}"
+                       class="btn btn-outline-light btn-sm">
+                        Tổng quan
+                    </a>
+
                     <a href="{{ route('bookings.index') }}"
                        class="btn btn-outline-light btn-sm">
                         Lịch sử đặt phòng
