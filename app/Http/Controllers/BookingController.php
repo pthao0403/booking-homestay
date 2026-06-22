@@ -97,6 +97,27 @@ class BookingController extends Controller
             'status' => 'pending', // Chờ xử lý/duyệt
         ]);
 
+        // Gửi email xác nhận đặt phòng (Gmail SMTP)
+        try {
+            \Illuminate\Support\Facades\Mail::to(Auth::user()->email)->send(new \App\Mail\BookingConfirmationMail($booking));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gửi mail xác nhận đặt phòng thất bại: ' . $e->getMessage());
+        }
+
+        // Tạo sự kiện trên Google Calendar
+        try {
+            if (config('google-calendar.calendar_id')) {
+                $event = new \Spatie\GoogleCalendar\Event;
+                $event->name = "[Booking] {$room->name} - Khách: " . Auth::user()->name;
+                $event->description = "Email: " . Auth::user()->email . "\nSố lượng: {$request->guests} người\nTổng tiền: " . number_format($totalPrice) . " VNĐ";
+                $event->startDateTime = Carbon::parse($checkin)->setTime(14, 0);
+                $event->endDateTime = Carbon::parse($checkout)->setTime(12, 0);
+                $event->save();
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Tạo Google Calendar event thất bại: ' . $e->getMessage());
+        }
+
         return redirect()->route('bookings.show', $booking)->with('success', 'Đặt phòng thành công! Yêu cầu của bạn đang chờ phê duyệt.');
     }
 
