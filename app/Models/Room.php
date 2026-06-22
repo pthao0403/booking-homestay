@@ -51,6 +51,9 @@ class Room extends Model
         return $this->hasMany(RoomImage::class);
     }
 
+
+
+
     /**
      * Get bookings for the room
      */

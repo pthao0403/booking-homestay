@@ -13,33 +13,55 @@
 
         <div class="collapse navbar-collapse" id="menu">
 
-            <ul class="navbar-nav me-auto">
+            <div class="ms-auto d-flex align-items-center gap-2">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/rooms">
-                        Phòng
-                    </a>
-                </li>
-
-            </ul>
-
-            <div class="d-flex align-items-center gap-2">
                 @auth
-                    <span class="text-white me-2">Chào, <strong>{{ Auth::user()->name }}</strong></span>
-                    <a href="{{ route('bookings.index') }}" class="btn btn-outline-light btn-sm">Lịch sử đặt phòng</a>
-                    
+
+                    <span class="text-white me-2">
+                        Chào, <strong>{{ Auth::user()->name }}</strong>
+                    </span>
+
+                    <a href="{{ route('dashboard') }}"
+                       class="btn btn-outline-light btn-sm">
+                        Tổng quan
+                    </a>
+
+                    <a href="{{ route('bookings.index') }}"
+                       class="btn btn-outline-light btn-sm">
+                        Lịch sử đặt phòng
+                    </a>
+
                     @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">Quản trị</a>
+                        <a href="{{ route('admin.dashboard') }}"
+                           class="btn btn-warning btn-sm">
+                            Quản trị
+                        </a>
                     @endif
 
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    <form action="{{ route('logout') }}"
+                          method="POST"
+                          class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">Đăng xuất</button>
+                        <button type="submit"
+                                class="btn btn-danger btn-sm">
+                            Đăng xuất
+                        </button>
                     </form>
+
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-light btn-sm">Đăng nhập</a>
-                    <a href="{{ route('register') }}" class="btn btn-warning btn-sm">Đăng ký</a>
+
+                    <a href="{{ route('login') }}"
+                       class="btn btn-light btn-sm">
+                        Đăng nhập
+                    </a>
+
+                    <a href="{{ route('register') }}"
+                       class="btn btn-warning btn-sm">
+                        Đăng ký
+                    </a>
+
                 @endauth
+
             </div>
 
         </div>

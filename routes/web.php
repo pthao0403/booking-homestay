@@ -1,19 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\RoomImagesController;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 // Home Page
-Route::get('/', function () {
-    return redirect()->route('rooms.index');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -35,36 +38,59 @@ Route::get('/rooms/{room}/booking', [RoomController::class, 'booking'])->name('r
 
 // Public Booking Routes (Customer)
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 });
 
-// Admin Room CRUD Routes
-Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
+// Admin Authentication Routes
+Route::get('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'showLogin'])->name('admin.login');
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AdminAuthController::class, 'login'])->name('admin.login.post');
+Route::post('/admin/logout', [\App\Http\Controllers\Admin\AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Admin Booking Management Routes
-Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
-Route::put('/admin/bookings/{booking}', [AdminBookingController::class, 'update'])->name('admin.bookings.update');
+// Protected Admin Routes
+Route::middleware(['auth'])->group(function () {
+    // Admin Dashboard Route
+    Route::get('/admin/dashboard', function () {
+        $totalRooms = Room::count();
+        $totalUsers = User::count();
+        try {
+            $totalBookings = DB::table('bookings')->count();
+            $revenue = DB::table('bookings')->where('status', 'confirmed')->sum('total_price');
+        } catch (\Exception $e) {
+            $totalBookings = 0;
+            $revenue = 0;
+        }
 
-// Admin Dashboard Route
-Route::get('/admin/dashboard', function () {
-    $totalRooms = Room::count();
-    $totalUsers = User::count();
-    try {
-        $totalBookings = DB::table('bookings')->count();
-        $revenue = DB::table('bookings')->where('status', 'confirmed')->sum('total_price');
-    } catch (\Exception $e) {
-        $totalBookings = 0;
-        $revenue = 0;
-    }
-    
-    // Format revenue as VNĐ
-    $revenue = number_format($revenue) . ' VNĐ';
-    
-    return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
-})->name('admin.dashboard');
+        // Format revenue as VNĐ
+        $revenue = number_format($revenue) . ' VNĐ';
+
+        return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
+    })->name('admin.dashboard');
+
+    // Admin Room CRUD Routes
+    Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
+
+    // Admin Room Images Upload
+    Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
+        ->name('admin.rooms.images.store');
+
+    // Signed URL for room images
+    Route::get('admin/rooms/{room}/images/signed-url', [\App\Http\Controllers\Admin\RoomImageSignedUrlController::class, 'signedUrl'])
+        ->name('admin.rooms.images.signed-url');
+
+    // Delete a room image (GCS + DB)
+    Route::delete('admin/rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\RoomImagesController::class, 'destroy'])
+        ->name('admin.rooms.images.destroy');
+
+
+    // Admin Booking Management Routes
+    Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::put('/admin/bookings/{booking}', [AdminBookingController::class, 'update'])->name('admin.bookings.update');
+});
+
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
@@ -75,10 +101,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', function (\Illuminate\Http\Request $request) {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
+            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
         ]);
 
-        auth()->user()->update([
+        Auth::user()->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
@@ -92,16 +118,14 @@ Route::middleware('auth')->group(function () {
             'new_password' => 'required|string|min:6|confirmed',
         ]);
 
-        if (auth()->user()->password && !\Illuminate\Support\Facades\Hash::check($request->current_password, auth()->user()->password)) {
+        if (Auth::user()->password && !\Illuminate\Support\Facades\Hash::check($request->current_password, Auth::user()->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.']);
         }
 
-        auth()->user()->update([
+        Auth::user()->update([
             'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
         ]);
 
         return back()->with('success', 'Đổi mật khẩu thành công!');
     })->name('profile.change-password');
 });
-
-

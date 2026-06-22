@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -14,6 +13,14 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $response->assertSee('CloudStay');
+    }
+
+    public function test_rooms_api_returns_a_successful_response(): void
+    {
+        $response = $this->get('/api/rooms');
+
+        $response->assertOk();
     }
 }
