@@ -17,21 +17,18 @@ class RoomImagesController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
-        $disk = Storage::disk('gcs');
+        $disk = Storage::disk('public');
 
         foreach ($request->file('images') as $file) {
             $extension = $file->getClientOriginalExtension();
             $filename = uniqid('room_', true) . '.' . $extension;
-            $objectPath = 'rooms/' . $room->id . '/' . $filename;
+            $folderPath = 'rooms/' . $room->id;
 
-            $disk->put($objectPath, file_get_contents($file->getRealPath()), [
-                'visibility' => 'private',
-                'contentType' => $file->getClientMimeType(),
-            ]);
+            $storedPath = $disk->putFileAs($folderPath, $file, $filename, 'public');
 
             RoomImage::create([
                 'room_id' => $room->id,
-                'image_url' => $objectPath,
+                'image_url' => Storage::disk('public')->url($storedPath),
             ]);
         }
 
@@ -58,10 +55,11 @@ class RoomImagesController extends Controller
             ], 422);
         }
 
-        $objectPath = $image->image_url;
-
         try {
-            Storage::disk('gcs')->delete($objectPath);
+            $path = str_replace('/storage/', '', parse_url($image->image_url, PHP_URL_PATH));
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
         } catch (\Throwable $e) {
             // continue deleting db record
         }

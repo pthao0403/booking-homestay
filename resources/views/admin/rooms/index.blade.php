@@ -25,24 +25,9 @@
         @php
             $thumb = $room->thumbnail_url;
             $fallback = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
-
-            $thumbUrl = null;
-            if ($thumb) {
-                // If currently stored as a local asset like: http://127.0.0.1:8000/storage/rooms/xxx.jpg
-                if (is_string($thumb) && str_contains($thumb, '/storage/')) {
-                    $filenamePath = preg_replace('#^.*?/storage/#', '', $thumb);
-                    $thumbUrl = "https://storage.googleapis.com/booking-homstay/{$filenamePath}";
-                } else {
-                    // If already an object path or a full URL, try Storage::disk('gcs')->url() first
-                    try {
-                        $thumbUrl = \Illuminate\Support\Facades\Storage::disk('gcs')->url($thumb);
-                    } catch (\Throwable $e) {
-                        $thumbUrl = $thumb;
-                    }
-                }
-            }
+            $thumbUrl = $thumb ?: $fallback;
         @endphp
-        <img src="{{ $thumbUrl ?: $fallback }}"
+        <img src="{{ $thumbUrl }}"
              class="card-img-top" style="height: 200px; object-fit: cover;">
 
         <div class="card-body">
