@@ -86,6 +86,27 @@ class BookingApiController extends Controller
             'status' => 'pending',
         ]);
 
+        // Gửi email xác nhận đặt phòng (Gmail SMTP)
+        try {
+            \Illuminate\Support\Facades\Mail::to(Auth::user()->email)->send(new \App\Mail\BookingConfirmationMail($booking));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gửi mail xác nhận đặt phòng API thất bại: ' . $e->getMessage());
+        }
+
+        // Tạo sự kiện trên Google Calendar
+        try {
+            if (config('google-calendar.calendar_id')) {
+                $event = new \Spatie\GoogleCalendar\Event;
+                $event->name = "[Booking API] {$room->name} - Khách: " . Auth::user()->name;
+                $event->description = "Email: " . Auth::user()->email . "\nSố lượng: {$request->guests} người\nTổng tiền: " . number_format($days * $room->price) . " VNĐ";
+                $event->startDateTime = Carbon::parse($checkin)->setTime(14, 0);
+                $event->endDateTime = Carbon::parse($checkout)->setTime(12, 0);
+                $event->save();
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Tạo Google Calendar event API thất bại: ' . $e->getMessage());
+        }
+
         return response()->json([
             'message' => 'Dat phong thanh cong.',
             'data' => $booking->load('room'),

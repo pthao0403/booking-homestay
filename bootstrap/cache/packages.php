@@ -52,6 +52,17 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
+  'spatie/laravel-google-calendar' => 
+  array (
+    'aliases' => 
+    array (
+      'GoogleCalendar' => 'Spatie\\GoogleCalendar\\GoogleCalendarFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\GoogleCalendar\\GoogleCalendarServiceProvider',
+    ),
+  ),
   'spatie/laravel-google-cloud-storage' => 
   array (
     'aliases' => 

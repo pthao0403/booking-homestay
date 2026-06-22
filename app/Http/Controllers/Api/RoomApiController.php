@@ -23,6 +23,16 @@ class RoomApiController extends Controller
                 });
             }
 
+            if ($request->filled('name')) {
+                $name = $request->string('name');
+                $query->where('name', 'like', '%' . $name . '%');
+            }
+
+            if ($request->filled('location')) {
+                $location = $request->string('location');
+                $query->where('address', 'like', '%' . $location . '%');
+            }
+
             $rooms = $query
                 ->where('status', 'available')
                 ->latest()

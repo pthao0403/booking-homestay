@@ -23,6 +23,16 @@ class RoomController extends Controller
             });
         }
 
+        if ($request->filled('name')) {
+            $name = $request->input('name');
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+
+        if ($request->filled('location')) {
+            $location = $request->input('location');
+            $query->where('address', 'like', '%' . $location . '%');
+        }
+
         // Only show available rooms for booking by default
         $rooms = $query->where('status', 'available')
                       ->paginate(9)

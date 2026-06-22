@@ -9,12 +9,27 @@ use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
-    public function index()
+    // ĐÃ SỬA: Thêm Request $request vào hàm index
+    public function index(Request $request)
     {
-        $rooms = Room::all();
-        if (request()->expectsJson()) {
+        $query = Room::query();
+
+        // Xử lý tìm kiếm (Nếu có từ khóa thì lọc theo name hoặc address)
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('address', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Lấy dữ liệu với phân trang (nên dùng paginate thay vì all để web mượt hơn)
+        $rooms = $query->paginate(10)->withQueryString();
+
+        if ($request->expectsJson()) {
             return response()->json($rooms);
         }
+        
         return view('admin.rooms.index', compact('rooms'));
     }
 
@@ -69,12 +84,10 @@ class RoomController extends Controller
                 $room->save();
             } catch (\Throwable $e) {
                 $room->delete();
-
                 return back()
                     ->withInput()
                     ->withErrors(['thumbnail' => 'Không thể tải ảnh lên Google Cloud Storage: ' . $e->getMessage()]);
             }
-
         } elseif ($request->filled('thumbnail_url')) {
             $room->thumbnail_url = $data['thumbnail_url'];
             $room->save();
@@ -122,7 +135,6 @@ class RoomController extends Controller
         $room->type = $data['type'];
 
         if ($request->hasFile('thumbnail')) {
-            // Xóa ảnh cũ trên GCS nếu có
             if ($room->thumbnail_url && !str_contains($room->thumbnail_url, 'http')) {
                 Storage::disk('gcs')->delete($room->thumbnail_url);
             }
@@ -131,7 +143,6 @@ class RoomController extends Controller
             $filename = uniqid('room_thumb_', true) . '.' . $extension;
             $folderPath = 'rooms/' . $room->id . '/thumbnail';
             
-            // Upload ảnh mới
             $request->file('thumbnail')->storeAs($folderPath, $filename, 'gcs');
             $room->thumbnail_url = $folderPath . '/' . $filename;
             
@@ -154,7 +165,6 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
-        // Xóa ảnh trên GCS
         if ($room->thumbnail_url && !str_contains($room->thumbnail_url, 'http')) {
             Storage::disk('gcs')->delete($room->thumbnail_url);
         }

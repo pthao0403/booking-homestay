@@ -147,6 +147,12 @@
                 </div>
             </div>
             
+            <div class="mt-4">
+                <a href="{{ \App\Services\GoogleCalendarService::getAddToCalendarUrl($booking) }}" target="_blank" class="btn btn-outline-danger w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 10px; border-color: #ef4444; color: #ef4444; background: transparent; transition: all 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">
+                    <i class="bi bi-calendar-plus-fill me-2"></i>Thêm lịch đặt phòng vào Google Calendar
+                </a>
+            </div>
+            
             <hr class="my-4" style="border-color: #e2e8f0;">
             
             <div class="d-flex gap-2">
