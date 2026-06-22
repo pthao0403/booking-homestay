@@ -6,6 +6,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\RoomImagesController;
 use App\Models\Room;
@@ -37,6 +38,7 @@ Route::get('/rooms/{room}/booking', [RoomController::class, 'booking'])->name('r
 
 // Public Booking Routes (Customer)
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
@@ -75,11 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/rooms/{room}/images', [\App\Http\Controllers\Admin\RoomImagesController::class, 'store'])
         ->name('admin.rooms.images.store');
 
-    // Signed URL for room images
-    Route::get('admin/rooms/{room}/images/signed-url', [\App\Http\Controllers\Admin\RoomImageSignedUrlController::class, 'signedUrl'])
-        ->name('admin.rooms.images.signed-url');
-
-    // Delete a room image (GCS + DB)
+    // Delete a room image
     Route::delete('admin/rooms/{room}/images/{image}', [\App\Http\Controllers\Admin\RoomImagesController::class, 'destroy'])
         ->name('admin.rooms.images.destroy');
 
@@ -127,5 +125,3 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', 'Đổi mật khẩu thành công!');
     })->name('profile.change-password');
 });
-
-

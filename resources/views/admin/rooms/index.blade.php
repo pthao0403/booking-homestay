@@ -33,19 +33,44 @@
         @forelse($rooms as $room)
             <div class="col-lg-4 mb-4">
                 <div class="card h-100">
+                    @php
+                        $thumb = $room->thumbnail_url;
+                        $fallback = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
+                        $thumbUrl = $thumb ?: $fallback;
+                    @endphp
+                    <img src="{{ $thumbUrl }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+
                     <div class="card-body">
                         <h5>{{ $room->name }}</h5>
                         <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ $room->address }}</p>
-                        <p><strong>Giá:</strong> {{ number_format($room->price) }} VNĐ</p>
+                        <p><strong>Giá:</strong> {{ number_format($room->price) }} VNĐ / đêm</p>
+                        <p>
+                            <strong>Sức chứa:</strong> {{ $room->capacity }} người | 
+                            <strong>Loại:</strong> 
+                            @php
+                                $roomTypes = [
+                                    'single' => 'Phòng đơn',
+                                    'double' => 'Phòng đôi',
+                                    'suite' => 'Phòng cao cấp (Suite)',
+                                    'vip' => 'Phòng VIP',
+                                    'family_suite' => 'Phòng Gia đình (Family Suite)'
+                                ];
+                            @endphp
+                            {{ $roomTypes[$room->type] ?? ucfirst($room->type) }}
+                        </p>
                         
-                        <div class="d-flex justify-content-between mt-3">
-                            <a href="{{ route('admin.rooms.edit', $room->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a href="{{ route('admin.rooms.show', $room->id) }}" class="btn btn-outline-primary btn-sm">Xem</a>
                             
-                            <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST" onsubmit="return confirm('Xóa thật không?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
-                            </form>
+                            <div>
+                                <a href="{{ route('admin.rooms.edit', $room->id) }}" class="btn btn-warning btn-sm">Sửa</a>
+                                
+                                <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phòng này?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
