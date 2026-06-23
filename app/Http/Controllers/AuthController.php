@@ -6,8 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Http;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -16,6 +16,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
+
         return view('auth.login');
     }
 
@@ -26,22 +27,22 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $remember = $request->has('remember');
-    }
-    public function handleForm(Request $request) {
-    // Gửi request kiểm tra lên Google
-    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-        'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
-        'response' => $request->input('g-recaptcha-response'),
-    ]);
+        $remember = $request->boolean('remember');
 
-    if (!$response->json()['success']) {
-        return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
-    }
-    
-    // Tiếp tục xử lý logic đăng nhập/đăng ký...
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
+            'response' => $request->input('g-recaptcha-response'),
+        ]);
+
+        if (!($response->json()['success'] ?? false)) {
+            return back()->withErrors([
+                'captcha' => 'Vui lòng xác minh bạn không phải là người máy!',
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
             return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
         }
 
@@ -55,6 +56,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
+
         return view('auth.register');
     }
 
@@ -83,17 +85,15 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/')->with('success', 'Đăng xuất thành công!');
     }
 
-    /**
-     * Redirect the user to the Google authentication page.
-     */
     public function redirectToGoogle()
     {
         $clientId = config('services.google.client_id');
+
         if (empty($clientId) || $clientId === 'YOUR_GOOGLE_CLIENT_ID') {
-            // Mock Mode!
             return redirect()->route('auth.google.mock');
         }
 
@@ -104,9 +104,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Obtain the user information from Google.
-     */
     public function handleGoogleCallback()
     {
         try {
@@ -122,7 +119,6 @@ class AuthController extends Controller
         ], [
             'name' => $googleUser->getName(),
             'google_id' => $googleUser->getId(),
-            // Password remains null or unchanged
         ]);
 
         Auth::login($user);
@@ -130,17 +126,11 @@ class AuthController extends Controller
         return redirect('/')->with('success', 'Đăng nhập bằng Google thành công!');
     }
 
-    /**
-     * Show the Mock Google login page.
-     */
     public function showGoogleMock()
     {
         return view('auth.google_mock');
     }
 
-    /**
-     * Handle Mock Google login submission.
-     */
     public function handleGoogleMock(Request $request)
     {
         $request->validate([

@@ -3,8 +3,7 @@
 @section('title', 'Tìm kiếm phòng - CloudStay')
 
 @section('content')
-<div class="rooms-page">
-    <!-- Header Section -->
+<div class="rooms-page" data-rooms-api="{{ route('api.rooms.index') }}" data-room-base-url="{{ url('/rooms') }}">
     <section class="rooms-hero">
         <div class="container">
             <h1 class="hero-title">Khám Phá Những Phòng Xinh Đẹp</h1>
@@ -13,31 +12,34 @@
     </section>
 
     <div class="container">
-        <!-- Filter Section -->
         <section class="filter-section">
             <div class="filter-card">
-                <form method="GET" class="filter-form">
+                <form method="GET" class="filter-form" id="rooms-filter-form">
                     <div class="form-group">
                         <label for="search">Tìm kiếm phòng</label>
                         <input type="text" id="search" name="search" class="form-control" placeholder="Tên phòng, địa chỉ..." value="{{ request('search') }}">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="check_in">Ngày nhận phòng</label>
                         <input type="date" id="check_in" name="check_in" class="form-control" value="{{ request('check_in') }}">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="check_out">Ngày trả phòng</label>
                         <input type="date" id="check_out" name="check_out" class="form-control" value="{{ request('check_out') }}">
                     </div>
-                    
+
                     <div class="form-group btn-group">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search"></i> Tìm kiếm
                         </button>
                         @if(request('search') || request('check_in') || request('check_out'))
-                            <a href="{{ route('rooms.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('rooms.index') }}" class="btn btn-secondary" id="rooms-clear-filter">
+                                <i class="bi bi-x-circle"></i> Xóa lọc
+                            </a>
+                        @else
+                            <a href="{{ route('rooms.index') }}" class="btn btn-secondary d-none" id="rooms-clear-filter">
                                 <i class="bi bi-x-circle"></i> Xóa lọc
                             </a>
                         @endif
@@ -46,15 +48,11 @@
             </div>
         </section>
 
-        <!-- Results Info -->
-        @if($rooms->total() > 0)
-            <div class="results-info">
-                <p>Tìm thấy <strong>{{ $rooms->total() }}</strong> phòng</p>
-            </div>
-        @endif
+        <div class="results-info" id="rooms-results-info" @if($rooms->total() === 0) hidden @endif>
+            <p>Tìm thấy <strong id="rooms-total-count">{{ $rooms->total() }}</strong> phòng</p>
+        </div>
 
-        <!-- Rooms Grid -->
-        <div class="rooms-grid">
+        <div class="rooms-grid" id="rooms-grid">
             @forelse($rooms as $room)
                 @php
                     $fallback = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
@@ -64,39 +62,32 @@
                         'double' => 'Phòng đôi',
                         'suite' => 'Suite',
                         'vip' => 'VIP',
-                        'family_suite' => 'Gia đình'
+                        'family_suite' => 'Gia đình',
                     ];
                 @endphp
-                
+
                 <div class="room-card">
-                    <!-- Image Container -->
                     <div class="room-image-wrapper">
                         <img src="{{ $thumbUrl }}" alt="{{ $room->name }}" class="room-image">
                         <span class="room-badge">{{ $roomTypes[$room->type] ?? ucfirst($room->type) }}</span>
                     </div>
-                    
-                    <!-- Content -->
+
                     <div class="room-content">
                         <h3 class="room-title">{{ $room->name }}</h3>
-                        
-                        <!-- Location -->
                         <p class="room-location">
                             <i class="bi bi-geo-alt"></i>
                             {{ $room->location }}
                         </p>
-                        
-                        <!-- Features -->
+
                         <div class="room-features">
                             <span class="feature-item">
                                 <i class="bi bi-people-fill"></i>
                                 {{ $room->capacity }} người
                             </span>
                         </div>
-                        
-                        <!-- Description -->
+
                         <p class="room-description">{{ Str::limit($room->description, 80) }}</p>
-                        
-                        <!-- Footer -->
+
                         <div class="room-footer">
                             <span class="room-price">{{ number_format($room->price) }}<small> VNĐ/đêm</small></span>
                             <a href="{{ route('rooms.show', $room) }}" class="btn btn-outline-primary">Chi Tiết <i class="bi bi-arrow-right"></i></a>
@@ -104,7 +95,7 @@
                     </div>
                 </div>
             @empty
-                <div class="empty-state">
+                <div class="empty-state" id="rooms-empty-state">
                     <i class="bi bi-inbox"></i>
                     <p>Không tìm thấy phòng nào phù hợp.</p>
                     <a href="{{ route('rooms.index') }}" class="btn btn-primary">Xem tất cả phòng</a>
@@ -112,12 +103,13 @@
             @endforelse
         </div>
 
-        <!-- Pagination -->
-        @if($rooms->total() > 0)
-            <div class="pagination-wrapper">
+        <div class="pagination-wrapper" id="rooms-pagination">
+            @if($rooms->total() > 0)
                 {{ $rooms->links() }}
-            </div>
-        @endif
+            @endif
+        </div>
+
+        <p class="text-muted small mt-3" id="rooms-api-status" hidden></p>
     </div>
 </div>
 
@@ -343,6 +335,25 @@
     .pagination-wrapper {
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pagination-wrapper .btn-page {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #1f2937;
+        border-radius: 8px;
+        padding: 0.55rem 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pagination-wrapper .btn-page.active,
+    .pagination-wrapper .btn-page:hover {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #fff;
     }
 
     @media (max-width: 768px) {
@@ -359,4 +370,191 @@
         }
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('[data-rooms-api]');
+
+    if (!root) {
+        return;
+    }
+
+    const apiUrl = root.dataset.roomsApi;
+    const roomBaseUrl = root.dataset.roomBaseUrl;
+    const form = document.getElementById('rooms-filter-form');
+    const grid = document.getElementById('rooms-grid');
+    const resultsInfo = document.getElementById('rooms-results-info');
+    const totalCount = document.getElementById('rooms-total-count');
+    const pagination = document.getElementById('rooms-pagination');
+    const status = document.getElementById('rooms-api-status');
+    const clearFilter = document.getElementById('rooms-clear-filter');
+
+    const roomTypeLabels = {
+        single: 'Phòng đơn',
+        double: 'Phòng đôi',
+        suite: 'Suite',
+        vip: 'VIP',
+        family_suite: 'Gia đình',
+    };
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function truncate(value, length = 80) {
+        if (!value) {
+            return '';
+        }
+
+        return value.length > length ? `${value.slice(0, length)}...` : value;
+    }
+
+    function getQueryParams(page = 1) {
+        const params = new URLSearchParams(new FormData(form));
+
+        if (page > 1) {
+            params.set('page', page);
+        } else {
+            params.delete('page');
+        }
+
+        return params;
+    }
+
+    function updateBrowserUrl(params) {
+        const nextUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', nextUrl);
+    }
+
+    function renderRooms(rooms) {
+        if (!rooms.length) {
+            grid.innerHTML = `
+                <div class="empty-state" id="rooms-empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Không tìm thấy phòng nào phù hợp.</p>
+                    <a href="${roomBaseUrl}" class="btn btn-primary">Xem tất cả phòng</a>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = rooms.map((room) => {
+            const thumbUrl = room.thumbnail_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500';
+            const roomType = roomTypeLabels[room.type] || room.type || 'Homestay';
+            const roomUrl = `${roomBaseUrl}/${room.id}`;
+
+            return `
+                <div class="room-card">
+                    <div class="room-image-wrapper">
+                        <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(room.name)}" class="room-image">
+                        <span class="room-badge">${escapeHtml(roomType)}</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">${escapeHtml(room.name)}</h3>
+                        <p class="room-location">
+                            <i class="bi bi-geo-alt"></i>
+                            ${escapeHtml(room.location || room.address || '')}
+                        </p>
+                        <div class="room-features">
+                            <span class="feature-item">
+                                <i class="bi bi-people-fill"></i>
+                                ${escapeHtml(room.capacity ?? 0)} người
+                            </span>
+                        </div>
+                        <p class="room-description">${escapeHtml(truncate(room.description || ''))}</p>
+                        <div class="room-footer">
+                            <span class="room-price">${Number(room.price || 0).toLocaleString('vi-VN')}<small> VNĐ/đêm</small></span>
+                            <a href="${roomUrl}" class="btn btn-outline-primary">Chi Tiết <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(currentPage, lastPage) {
+        if (lastPage <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        const buttons = [];
+
+        for (let page = 1; page <= lastPage; page += 1) {
+            buttons.push(`
+                <button type="button" class="btn-page ${page === currentPage ? 'active' : ''}" data-page="${page}">
+                    ${page}
+                </button>
+            `);
+        }
+
+        pagination.innerHTML = buttons.join('');
+
+        pagination.querySelectorAll('[data-page]').forEach((button) => {
+            button.addEventListener('click', () => {
+                fetchRooms(Number(button.dataset.page));
+            });
+        });
+    }
+
+    async function fetchRooms(page = 1) {
+        const params = getQueryParams(page);
+        const requestUrl = `${apiUrl}?${params.toString()}`;
+
+        try {
+            status.hidden = true;
+            const response = await fetch(requestUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('rooms_fetch_failed');
+            }
+
+            const payload = await response.json();
+            const rooms = payload.data || [];
+
+            renderRooms(rooms);
+            renderPagination(payload.current_page || 1, payload.last_page || 1);
+
+            if (resultsInfo && totalCount) {
+                const total = Number(payload.total || 0);
+                resultsInfo.hidden = total === 0;
+                totalCount.textContent = total;
+            }
+
+            if (clearFilter) {
+                clearFilter.classList.toggle('d-none', !params.get('search') && !params.get('check_in') && !params.get('check_out'));
+            }
+
+            updateBrowserUrl(params);
+        } catch (error) {
+            status.hidden = false;
+            status.textContent = 'Không thể tải danh sách phòng từ API, đang hiển thị dữ liệu fallback của server.';
+        }
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        fetchRooms(1);
+    });
+
+    if (clearFilter) {
+        clearFilter.addEventListener('click', (event) => {
+            event.preventDefault();
+            form.reset();
+            fetchRooms(1);
+        });
+    }
+
+    fetchRooms(Number(new URLSearchParams(window.location.search).get('page') || 1));
+});
+</script>
 @endsection
