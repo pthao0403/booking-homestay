@@ -61,10 +61,13 @@
                     </a>
 
                 @endauth
-
-            </div>
-
         </div>
 
     </div>
+  <div class="custom-translate ms-2" style="min-width: 170px;">
+    <div id="google_translate_element"></div>
+</div>
+
+                </div>
+
 </nav>

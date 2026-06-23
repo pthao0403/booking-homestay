@@ -9,7 +9,10 @@
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
-<div id="google_translate_element"></div>
+<div class="hidden sm:flex sm:items-center sm:ms-6">
+    <div id="google_translate_element" class="mr-4"></div>
+    
+    <x-dropdown align="right" width="48">
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
