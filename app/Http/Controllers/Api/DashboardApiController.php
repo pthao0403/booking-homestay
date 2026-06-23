@@ -16,24 +16,29 @@ class DashboardApiController extends Controller
             $totalRooms = Room::count();
             $totalUsers = User::count();
             $totalBookings = DB::table('bookings')->count();
-            $revenue = DB::table('bookings')
+            
+            // Sửa đổi: Chỉ tính tổng tiền dựa trên cột total_price chuẩn của bạn
+            $revenue = (float) DB::table('bookings')
                 ->where('status', 'confirmed')
-                ->sum(DB::raw('COALESCE(final_total, total_price)'));
-        } catch (\Throwable $e) {
-            $totalRooms = 0;
-            $totalUsers = 0;
-            $totalBookings = 0;
-            $revenue = 0;
-        }
+                ->sum('total_price');
 
-        return response()->json([
-            'data' => [
+            // Trả về cấu trúc phẳng khớp hoàn toàn với các biến mappings trong Javascript file Blade
+            return response()->json([
+                'success' => true,
                 'total_rooms' => $totalRooms,
                 'total_users' => $totalUsers,
                 'total_bookings' => $totalBookings,
-                'revenue' => (float) $revenue,
-                'formatted_revenue' => number_format((float) $revenue) . ' VND',
-            ],
-        ]);
+                'revenue' => $revenue,
+                'formatted_revenue' => number_format($revenue) . ' VNĐ',
+            ]);
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Lỗi DashboardApiController: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi xử lý dữ liệu hệ thống.',
+            ], 500);
+        }
     }
 }
