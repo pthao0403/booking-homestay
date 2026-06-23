@@ -55,4 +55,17 @@
             <small>© {{ date('Y') }} CloudStay. All Rights Reserved.</small>
         </div>
     </div>
+
+
+</div>
+<div class="google-safety-badge border p-2 rounded bg-light d-inline-flex align-items-center">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_Search_Safety.svg" alt="Google Safe" width="20" class="me-2">
+    <small class="text-muted">
+        Bảo mật bởi 
+        <a href="https://transparencyreport.google.com/safe-browsing/search?url=127.0.0.1" target="_blank" class="fw-bold text-success text-decoration-none">
+            Google Safe Browsing 🛡️
+        </a>
+    </small>
+</div>
+
 </footer>

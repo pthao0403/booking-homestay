@@ -28,15 +28,19 @@
             {{ $slot }}
         </div>
     </div>
-    <script type="text/javascript">
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'vi', // Ngôn ngữ mặc định gốc của trang web (Tiếng Việt)
-    includedLanguages: 'en,vi', // Các ngôn ngữ cho phép chuyển đổi (Anh, Việt)
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-  }, 'google_translate_element');
-}
-</script>
+    </div>
 
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'vi', // Ngôn ngữ chính của website là Tiếng Việt
+                    includedLanguages: 'en,vi', // Chỉ cho phép chuyển qua lại giữa Anh và Việt
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                }, 'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </body>
+</html>
+
 </body>

@@ -38,19 +38,21 @@ class BookingController extends Controller
 
         return view('bookings.history', compact('bookings'));
     }
-public function handleForm(Request $request) {
-    // Gửi request kiểm tra lên Google
-    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-        'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
-        'response' => $request->input('g-recaptcha-response'),
-    ]);
 
-    if (!$response->json()['success']) {
-        return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+    public function handleForm(Request $request) {
+        // Gửi request kiểm tra lên Google
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
+            'response' => $request->input('g-recaptcha-response'),
+        ]);
+
+        if (!$response->json()['success']) {
+            return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+        }
+        
+        // Tiếp tục xử lý logic đăng nhập/đăng ký...
     }
     
-    // Tiếp tục xử lý logic đăng nhập/đăng ký...
-}
     /**
      * Store a newly created booking in storage.
      */
@@ -147,6 +149,31 @@ public function handleForm(Request $request) {
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Tạo Google Calendar event thất bại: ' . $e->getMessage());
         }
+
+        // ==========================================
+        // TỰ ĐỘNG BẮN HOÁ ĐƠN ĐẶT PHÒNG VỀ ZOHO CLIQ
+        // ==========================================
+        try {
+            $zohoCliqUrl = env('ZOHO_CLIQ_WEBHOOK_URL');
+            
+            if ($zohoCliqUrl) {
+                $message = "🔔 *CÓ ĐƠN ĐẶT PHÒNG MỚI CHỜ DUYỆT!*\n"
+                         . "• Mã đơn: #" . $booking->id . "\n"
+                         . "• Khách hàng: " . Auth::user()->name . "\n"
+                         . "• Phòng đặt: " . $room->name . "\n"
+                         . "• Tổng tiền: " . number_format($totalPrice) . " VND";
+
+                // Bắn tin nhắn qua ứng dụng chat Zoho Cliq
+                // Thêm 'verify' => false để chạy mượt ở localhost không có SSL
+                Http::withOptions(['verify' => false])
+                    ->post($zohoCliqUrl, [
+                        'text' => $message
+                    ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Lỗi Zoho Cliq: ' . $e->getMessage());
+        }
+        // ==========================================
 
         return redirect()->route('bookings.show', $booking)->with('success', 'Đặt phòng thành công! Yêu cầu của bạn đang chờ phê duyệt.');
     }
