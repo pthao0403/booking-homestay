@@ -1,26 +1,16 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
+    public function up(): void
     {
-        Schema::create('bookings', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email');
-            $table->date('checkin');
-            $table->date('checkout');
-            $table->unsignedTinyInteger('guests')->default(1);
-            $table->text('notes')->nullable();
-            $table->timestamps();
-        });
+        // The bookings table is already created by 2026_01_01_000004_create_bookings_table.
+        // Keep this migration as a no-op so existing databases can continue migrating cleanly.
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('bookings');
+        // No-op because this migration does not own the bookings table.
     }
 };

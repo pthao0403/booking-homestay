@@ -13,6 +13,8 @@ use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\VoucherController;
+use App\Services\VoucherSheetService;
 
 // Home Page
 Route::get('/', [HomeController::class, 'index'])
@@ -56,9 +58,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', function () {
         $totalRooms = Room::count();
         $totalUsers = User::count();
+        $totalVouchers = count(app(VoucherSheetService::class)->all());
+        $activeVouchers = app(VoucherSheetService::class)->countActive();
+        $expiredVouchers = app(VoucherSheetService::class)->countExpired();
         try {
             $totalBookings = DB::table('bookings')->count();
-            $revenue = DB::table('bookings')->where('status', 'confirmed')->sum('total_price');
+            $revenue = DB::table('bookings')
+                ->where('status', 'confirmed')
+                ->sum(DB::raw('COALESCE(final_total, total_price)'));
         } catch (\Exception $e) {
             $totalBookings = 0;
             $revenue = 0;
@@ -67,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
         // Format revenue as VNĐ
         $revenue = number_format($revenue) . ' VNĐ';
 
-        return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue'));
+        return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue', 'totalVouchers', 'activeVouchers', 'expiredVouchers'));
     })->name('admin.dashboard');
 
     // Admin Room CRUD Routes
@@ -125,3 +132,9 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', 'Đổi mật khẩu thành công!');
     })->name('profile.change-password');
 });
+// Voucher Check Route
+Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+Route::post(
+    '/voucher/check',
+    [VoucherController::class,'check']
+)->name('voucher.check');

@@ -17,6 +17,9 @@ class Booking extends Model
         'checkout_date',
         'total_guests',
         'total_price',
+        'voucher_code',
+        'discount_amount',
+        'final_total',
         'status'
     ];
 
@@ -27,6 +30,8 @@ class Booking extends Model
         'checkin_date' => 'date',
         'checkout_date' => 'date',
         'total_price' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'final_total' => 'decimal:2',
     ];
 
     /**
@@ -75,6 +80,16 @@ class Booking extends Model
         return Attribute::make(
             get: fn () => $this->total_guests,
             set: fn ($value) => ['total_guests' => $value],
+        );
+    }
+
+    /**
+     * Prefer discounted total when available.
+     */
+    protected function payableTotal(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->final_total ?? $this->total_price,
         );
     }
 }

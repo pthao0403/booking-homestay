@@ -18,7 +18,7 @@ class DashboardApiController extends Controller
             $totalBookings = DB::table('bookings')->count();
             $revenue = DB::table('bookings')
                 ->where('status', 'confirmed')
-                ->sum('total_price');
+                ->sum(DB::raw('COALESCE(final_total, total_price)'));
         } catch (\Throwable $e) {
             $totalRooms = 0;
             $totalUsers = 0;

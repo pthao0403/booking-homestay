@@ -74,7 +74,7 @@
             <p class="mb-0 opacity-75">Mã đặt phòng: <strong>#{{ $booking->id }}</strong></p>
             <p class="mb-0 opacity-75">Ngày đặt: {{ $booking->created_at->format('d/m/Y H:i') }}</p>
         </div>
-        
+
         <div class="card-body p-4 p-md-5 text-start">
             <div class="text-center mb-4">
                 @if($booking->status === 'pending')
@@ -121,13 +121,13 @@
                 <span class="text-muted">Ngày trả phòng (Check-out)</span>
                 <span class="fw-semibold text-dark">{{ $booking->check_out ? $booking->check_out->format('d/m/Y') : 'N/A' }}</span>
             </div>
-            
+
             @php
                 $checkIn = \Carbon\Carbon::parse($booking->checkin_date);
                 $checkOut = \Carbon\Carbon::parse($booking->checkout_date);
                 $nights = $checkIn->diffInDays($checkOut) ?: 1;
             @endphp
-            
+
             <div class="detail-item">
                 <span class="text-muted">Số đêm lưu trú</span>
                 <span class="fw-semibold text-dark">{{ $nights }} đêm</span>
@@ -137,24 +137,39 @@
                 <span class="fw-semibold text-dark">{{ $booking->guests }} người</span>
             </div>
 
+            @if($booking->voucher_code || (float) $booking->discount_amount > 0)
+                <div class="detail-item">
+                    <span class="text-muted">Mã giảm giá</span>
+                    <span class="fw-semibold text-dark">{{ $booking->voucher_code ?? 'Không có' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="text-muted">Giá gốc</span>
+                    <span class="fw-semibold text-dark">{{ number_format((float) $booking->total_price) }} VNĐ</span>
+                </div>
+                <div class="detail-item">
+                    <span class="text-muted">Giảm giá</span>
+                    <span class="fw-semibold text-success">-{{ number_format((float) $booking->discount_amount) }} VNĐ</span>
+                </div>
+            @endif
+
             <div class="total-price-box d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-0 fw-bold text-dark">TỔNG CHI PHÍ TẠM TÍNH</h6>
+                    <h6 class="mb-0 fw-bold text-dark">TỔNG THANH TOÁN</h6>
                     <small class="text-muted">Đã bao gồm tất cả các thuế phí liên quan</small>
                 </div>
                 <div class="text-end">
-                    <span class="fs-3 fw-bold text-danger">{{ number_format((float)$booking->total_price) }} VNĐ</span>
+                    <span class="fs-3 fw-bold text-danger">{{ number_format((float) $booking->payable_total) }} VNĐ</span>
                 </div>
             </div>
-            
+
             <div class="mt-4">
                 <a href="{{ \App\Services\GoogleCalendarService::getAddToCalendarUrl($booking) }}" target="_blank" class="btn btn-outline-danger w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 10px; border-color: #ef4444; color: #ef4444; background: transparent; transition: all 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">
                     <i class="bi bi-calendar-plus-fill me-2"></i>Thêm lịch đặt phòng vào Google Calendar
                 </a>
             </div>
-            
+
             <hr class="my-4" style="border-color: #e2e8f0;">
-            
+
             <div class="d-flex gap-2">
                 <a href="{{ route('bookings.index') }}" class="btn btn-outline-secondary w-50 py-2.5 fw-semibold" style="border-radius: 10px;">Lịch sử đặt phòng</a>
                 <a href="{{ route('rooms.index') }}" class="btn btn-primary w-50 py-2.5 fw-semibold" style="border-radius: 10px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Khám phá phòng khác</a>

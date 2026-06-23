@@ -175,7 +175,6 @@ class RoomController extends Controller
             $oldPath = ltrim($oldPath, '/');
             Storage::disk('gcs')->delete($oldPath);
         }
-        }
 
         $room->delete();
 
