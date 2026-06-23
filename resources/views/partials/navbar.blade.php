@@ -5,6 +5,18 @@
             CloudStay
         </a>
 
+        <div class="ms-auto d-flex align-items-center gap-2 flex-wrap justify-content-end me-2">
+            <a href="{{ route('login') }}"
+               class="btn btn-light btn-sm">
+                Đăng nhập
+            </a>
+
+            <a href="{{ route('register') }}"
+               class="btn btn-warning btn-sm">
+                Đăng ký
+            </a>
+        </div>
+
         <button class="navbar-toggler"
                 data-bs-toggle="collapse"
                 data-bs-target="#menu">
@@ -12,11 +24,8 @@
         </button>
 
         <div class="collapse navbar-collapse" id="menu">
-
-            <div class="ms-auto d-flex align-items-center gap-2">
-
+            <div class="ms-auto d-flex align-items-center gap-2 flex-wrap justify-content-end">
                 @auth
-
                     <span class="text-white me-2">
                         Chào, <strong>{{ Auth::user()->name }}</strong>
                     </span>
@@ -47,27 +56,12 @@
                             Đăng xuất
                         </button>
                     </form>
-
-                @else
-
-                    <a href="{{ route('login') }}"
-                       class="btn btn-light btn-sm">
-                        Đăng nhập
-                    </a>
-
-                    <a href="{{ route('register') }}"
-                       class="btn btn-warning btn-sm">
-                        Đăng ký
-                    </a>
-
                 @endauth
-        </div>
 
-    </div>
-  <div class="custom-translate ms-2" style="min-width: 170px;">
-    <div id="google_translate_element"></div>
-</div>
-
+                <div class="custom-translate ms-2" style="min-width: 170px;">
+                    <div id="google_translate_element"></div>
                 </div>
-
+            </div>
+        </div>
+    </div>
 </nav>
