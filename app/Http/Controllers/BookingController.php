@@ -8,13 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-// IMPORT THƯ VIỆN GOOGLE CHÍNH CHỦ
-use Google\Client as GoogleClient;
-use Google\Service\Drive as GoogleServiceDrive;
-use Google\Service\Drive\DriveFile;
 
 class BookingController extends Controller
 {
+
+
     /**
      * Display a listing of the user's bookings.
      */
@@ -54,7 +52,7 @@ class BookingController extends Controller
         
         // Tiếp tục xử lý logic đăng nhập/đăng ký...
     }
-
+    
     /**
      * Store a newly created booking in storage.
      */
@@ -136,50 +134,33 @@ class BookingController extends Controller
         }
 
         // ==========================================
-        // TÍNH NĂNG ĐỘC LẠ: TỰ ĐỘNG UP HOÁ ĐƠN LÊN GOOGLE DRIVE
+        // TỰ ĐỘNG BẮN HOÁ ĐƠN ĐẶT PHÒNG VỀ ZOHO CLIQ
         // ==========================================
         try {
-            // Khởi tạo file hóa đơn dạng text
-            $fileName = 'HoaDon_Booking_' . $booking->id . '_' . now()->format('Ymd_His') . '.txt';
-            $fileContent = "=== HOÁ ĐƠN ĐẶT PHÒNG CLOUDSTAY ===\n";
-            $fileContent .= "Mã đặt phòng: #" . $booking->id . "\n";
-            $fileContent .= "Tên phòng: " . $room->name . "\n";
-            $fileContent .= "Khách hàng: " . Auth::user()->name . "\n";
-            $fileContent .= "Email: " . Auth::user()->email . "\n";
-            $fileContent .= "Thời gian ở: " . $checkin . " đến " . $checkout . " (" . $days . " đêm)\n";
-            $fileContent .= "Số lượng khách: " . $request->guests . " người\n";
-            $fileContent .= "Tổng tiền thanh toán: " . number_format($totalPrice) . " VND\n";
-            $fileContent .= "Trạng thái: Đang chờ duyệt (Pending)\n";
-            $fileContent .= "Ngày xuất hóa đơn: " . now()->toDateTimeString() . "\n";
+            $zohoCliqUrl = env('ZOHO_CLIQ_WEBHOOK_URL');
+            
+            if ($zohoCliqUrl) {
+                $message = "🔔 *CÓ ĐƠN ĐẶT PHÒNG MỚI CHỜ DUYỆT!*\n"
+                         . "• Mã đơn: #" . $booking->id . "\n"
+                         . "• Khách hàng: " . Auth::user()->name . "\n"
+                         . "• Phòng đặt: " . $room->name . "\n"
+                         . "• Tổng tiền: " . number_format($totalPrice) . " VND";
 
-            // Kết nối Google API Client
-            $client = new GoogleClient();
-            $client->setAuthConfig(storage_path('app/google-service-account.json'));
-            $client->addScope(GoogleServiceDrive::DRIVE);
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
-            $driveService = new GoogleServiceDrive($client);
-
-            // Cấu hình metadata để đẩy vào thư mục chỉ định
-            $fileMetadata = new DriveFile([
-                'name' => $fileName,
-                'parents' => [env('GOOGLE_DRIVE_FOLDER_ID')]
-            ]);
-
-            // Thực thi upload dữ liệu dạng text thuần lên Drive
-            $driveService->files->create($fileMetadata, [
-                'data' => $fileContent,
-                'mimeType' => 'text/plain',
-                'uploadType' => 'multipart',
-                'fields' => 'id',
-                'supportsAllDrives' => true,
-            ]);
+                // Bắn tin nhắn qua ứng dụng chat Zoho Cliq
+                // Thêm 'verify' => false để chạy mượt ở localhost không có SSL
+                Http::withOptions(['verify' => false])
+                    ->post($zohoCliqUrl, [
+                        'text' => $message
+                    ]);
+            }
         } catch (\Exception $e) {
-            // Đưa về dạng ghi log âm thầm như cũ khi chạy thực tế
-            \Illuminate\Support\Facades\Log::error('Lỗi upload Google Drive API: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Lỗi Zoho Cliq: ' . $e->getMessage());
         }
+        // ==========================================
 
         return redirect()->route('bookings.show', $booking)->with('success', 'Đặt phòng thành công! Yêu cầu của bạn đang chờ phê duyệt.');
     }
+
     /**
      * Display the specified booking detail.
      */

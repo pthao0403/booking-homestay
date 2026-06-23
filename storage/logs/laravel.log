@@ -2514,3 +2514,26 @@
   }
 }
   
+[2026-06-23 12:42:47] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 12:42:49] local.ERROR: Lỗi upload Google Drive API: {
+  "error": {
+    "code": 403,
+    "message": "Service Accounts do not have storage quota. Leverage shared drives (https://developers.google.com/workspace/drive/api/guides/about-shareddrives), or use OAuth delegation (http://support.google.com/a/answer/7281227) instead.",
+    "errors": [
+      {
+        "message": "Service Accounts do not have storage quota. Leverage shared drives (https://developers.google.com/workspace/drive/api/guides/about-shareddrives), or use OAuth delegation (http://support.google.com/a/answer/7281227) instead.",
+        "domain": "usageLimits",
+        "reason": "storageQuotaExceeded"
+      }
+    ]
+  }
+}
+  
+[2026-06-23 12:46:17] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 12:46:17] local.ERROR: Lỗi upload Google Drive API: (create) unknown parameter: 'options'  
+[2026-06-23 12:49:34] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 12:49:34] local.ERROR: Lỗi upload Google Drive API: (create) unknown parameter: 'options'  
+[2026-06-23 13:11:28] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 13:14:34] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 13:15:34] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
+[2026-06-23 13:21:18] local.ERROR: Gửi mail xác nhận đặt phòng thất bại: Connection could not be established with host "mailhog:1025": stream_socket_client(): php_network_getaddresses: getaddrinfo for mailhog failed: No such host is known  
