@@ -55,18 +55,25 @@ Route::post('/admin/logout', [\App\Http\Controllers\Admin\AdminAuthController::c
 // Protected Admin Routes
 Route::middleware(['auth'])->group(function () {
     // Admin Dashboard Route
+    // Admin Dashboard Route
     Route::get('/admin/dashboard', function () {
         $totalRooms = Room::count();
         $totalUsers = User::count();
         $totalVouchers = count(app(VoucherSheetService::class)->all());
         $activeVouchers = app(VoucherSheetService::class)->countActive();
         $expiredVouchers = app(VoucherSheetService::class)->countExpired();
+        
         try {
             $totalBookings = DB::table('bookings')->count();
+            
+            // SỬA TẠI ĐÂY: Chỉ tính tổng tiền dựa trên cột total_price chuẩn trong DB của bạn
             $revenue = DB::table('bookings')
                 ->where('status', 'confirmed')
-                ->sum(DB::raw('COALESCE(final_total, total_price)'));
+                ->sum('total_price');
+                
         } catch (\Exception $e) {
+            // Ghi lỗi ra file log nếu sau này có lỗi khác xảy ra để dễ tìm
+            \Illuminate\Support\Facades\Log::error('Lỗi tính toán Dashboard Web: ' . $e->getMessage());
             $totalBookings = 0;
             $revenue = 0;
         }
@@ -76,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
 
         return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue', 'totalVouchers', 'activeVouchers', 'expiredVouchers'));
     })->name('admin.dashboard');
+    
 
     // Admin Room CRUD Routes
     Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
