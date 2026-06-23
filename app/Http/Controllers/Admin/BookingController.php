@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('admin');
+        $this->middleware(\App\Http\Middleware\AdminOnly::class);
     }
 
     /**
@@ -18,7 +19,7 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             abort(403, 'Bạn không có quyền truy cập trang quản trị này.');
         }
 
@@ -38,7 +39,7 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             abort(403, 'Bạn không có quyền truy cập trang quản trị này.');
         }
 

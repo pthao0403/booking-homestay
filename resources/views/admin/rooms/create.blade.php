@@ -23,10 +23,14 @@
             <div class="form-group">
                 <label for="location">Địa chỉ</label>
                 <input type="text" id="location" name="location" required value="{{ old('location') }}">
+                <div id="address-suggestions"></div>
                 @error('location')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
+
+            <input type="hidden" id="latitude" name="latitude" value="{{ old('latitude') }}">
+            <input type="hidden" id="longitude" name="longitude" value="{{ old('longitude') }}">
             
             <div class="form-group">
                 <label for="description">Mô tả</label>
@@ -89,3 +93,93 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIMINA/AqTMRgpP_TAkM+lNuPPpbjJhEgVw="
+    crossorigin=""/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-search@3.0.2/dist/leaflet-search.min.css" />
+<style>
+    #address-suggestions {
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        position: absolute;
+        background-color: white;
+        z-index: 1000;
+        width: calc(100% - 24px);
+    }
+    #address-suggestions div {
+        padding: 8px;
+        cursor: pointer;
+    }
+    #address-suggestions div:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const locationInput = document.getElementById('location');
+    const suggestionsContainer = document.getElementById('address-suggestions');
+    const latitudeInput = document.getElementById('latitude');
+    const longitudeInput = document.getElementById('longitude');
+    let debounceTimer;
+
+    locationInput.addEventListener('keyup', function() {
+        clearTimeout(debounceTimer);
+        const query = locationInput.value;
+
+        if (query.length < 3) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestionsContainer.innerHTML = '';
+                    if (data.features && data.features.length > 0) {
+                        suggestionsContainer.style.display = 'block';
+                        data.features.forEach(feature => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.textContent = feature.properties.name + (feature.properties.city ? ', ' + feature.properties.city : '') + (feature.properties.country ? ', ' + feature.properties.country : '');
+                            suggestionDiv.addEventListener('click', function() {
+                                locationInput.value = this.textContent;
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none';
+                                
+                                // Geocode with Nominatim
+                                fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationInput.value)}&format=jsonv2&limit=1`)
+                                    .then(response => response.json())
+                                    .then(geoData => {
+                                        if (geoData && geoData.length > 0) {
+                                            latitudeInput.value = geoData[0].lat;
+                                            longitudeInput.value = geoData[0].lon;
+                                        }
+                                    });
+                            });
+                            suggestionsContainer.appendChild(suggestionDiv);
+                        });
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                });
+        }, 300);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.id !== 'location') {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+</script>
+@endpush
