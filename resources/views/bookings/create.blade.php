@@ -26,7 +26,9 @@
         <input type="number"
                class="form-control">
     </div>
-
+<div class="form-group mb-3 flex justify-center">
+        <div class="g-recaptcha" data-sitekey="6LeYGy4tAAAAAEZ5RbWMHeG1akKzenTZEcwD4bDA"></div>
+    </div>
     <button class="btn btn-primary">
         Xác nhận đặt phòng
     </button>

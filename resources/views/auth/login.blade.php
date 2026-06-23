@@ -30,7 +30,11 @@
                 <input type="checkbox" id="remember" name="remember" class="form-check-input">
                 <label for="remember" class="form-check-label text-muted" style="font-size: 0.9rem;">Ghi nhớ đăng nhập</label>
             </div>
-            
+              
+        <div class="mt-4 flex justify-center">
+            <div class="g-recaptcha" data-sitekey="6LeYGy4tAAAAAEZ5RbWMHeG1akKzenTZEcwD4bDA"></div>
+        </div>
+
             <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3" style="border-radius: 8px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Đăng nhập</button>
 
             <a href="{{ route('admin.login') }}" class="btn btn-outline-dark w-100 py-2 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 8px; border-color: #111827; color: #111827; background: white; transition: all 0.3s;">
@@ -41,7 +45,8 @@
                 <hr class="text-muted">
                 <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted" style="font-size: 0.85rem;">HOẶC</span>
             </div>
-            
+         
+    </form>
             <a href="{{ route('auth.google') }}" class="btn btn-outline-danger w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2" style="border-radius: 8px; border-color: #ef4444; color: #ef4444; background: white; transition: all 0.3s;">
                 <i class="bi bi-google"></i> Đăng nhập bằng Google
             </a>
