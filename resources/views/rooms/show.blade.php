@@ -117,11 +117,18 @@
                 <!-- Map Placeholder -->
                 <section class="map-section">
                     <h2 class="section-title"><i class="bi bi-map"></i> Vị Trí</h2>
-                    <div class="map-placeholder">
-                        <i class="bi bi-geo-alt"></i>
-                        <p>Bản đồ vị trí sẽ hiển thị tại đây</p>
-                        <small>Google Maps sẽ được tích hợp sớm</small>
-                    </div>
+                    @if($room->latitude && $room->longitude)
+                        <div id="map"
+                             data-latitude="{{ $room->latitude }}"
+                             data-longitude="{{ $room->longitude }}"
+                             data-name="{{ $room->name }}"
+                             data-address="{{ $room->address }}"></div>
+                    @else
+                        <div class="map-placeholder">
+                            <i class="bi bi-geo-alt"></i>
+                            <p>Không có thông tin vị trí để hiển thị bản đồ.</p>
+                        </div>
+                    @endif
                 </section>
             </div>
 
@@ -407,6 +414,14 @@
         margin: 0.5rem 0;
     }
 
+    /* Leaflet map container must have an explicit height */
+    #map {
+        width: 100%;
+        height: 360px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
     .map-placeholder small {
         display: block;
         color: #9ca3af;
@@ -624,3 +639,59 @@
     }
 </style>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIMINA/AqTMRgpP_TAkM+lNuPPpbjJhEgVw="
+    crossorigin=""/>
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return;
+
+    const lat = parseFloat(mapElement.dataset.latitude);
+    const lon = parseFloat(mapElement.dataset.longitude);
+    const name = mapElement.dataset.name;
+    const address = mapElement.dataset.address;
+
+    // Delay initialization so surrounding layout (grid, images) can settle
+    setTimeout(function() {
+        // Ensure default marker images load from CDN
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+        });
+
+        // Create map
+        var map = L.map('map', { preferCanvas: false }).setView([lat, lon], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var marker = L.marker([lat, lon]).addTo(map);
+        marker.bindPopup(`<b>${name}</b><br>${address}`).openPopup();
+
+        // Multiple invalidations to handle various layout timings
+        function refreshMap() {
+            try { map.invalidateSize(); } catch (e) {}
+            try { map.setView([lat, lon]); } catch (e) {}
+        }
+
+        setTimeout(refreshMap, 100);
+        setTimeout(refreshMap, 300);
+        setTimeout(refreshMap, 800);
+
+        window.addEventListener('resize', refreshMap);
+    }, 220);
+});
+</script>
+@endpush

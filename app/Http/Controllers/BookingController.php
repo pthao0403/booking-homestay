@@ -7,6 +7,7 @@ use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class BookingController extends Controller
 {
@@ -37,7 +38,19 @@ class BookingController extends Controller
 
         return view('bookings.history', compact('bookings'));
     }
+public function handleForm(Request $request) {
+    // Gửi request kiểm tra lên Google
+    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
+        'response' => $request->input('g-recaptcha-response'),
+    ]);
 
+    if (!$response->json()['success']) {
+        return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+    }
+    
+    // Tiếp tục xử lý logic đăng nhập/đăng ký...
+}
     /**
      * Store a newly created booking in storage.
      */

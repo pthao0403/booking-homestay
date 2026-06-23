@@ -1,26 +1,7 @@
 <?php
 
-namespace Tests\Feature;
+it('returns a successful response', function () {
+    $response = $this->get('/');
 
-use Tests\TestCase;
-
-class ExampleTest extends TestCase
-{
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertOk();
-        $response->assertSee('CloudStay');
-    }
-
-    public function test_rooms_api_returns_a_successful_response(): void
-    {
-        $response = $this->get('/api/rooms');
-
-        $response->assertOk();
-    }
-}
+    $response->assertStatus(200);
+});

@@ -49,6 +49,8 @@ class RoomController extends Controller
             'type' => 'required|string|in:single,double,suite,vip,family_suite',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'thumbnail_url' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $room = new Room();
@@ -58,6 +60,13 @@ class RoomController extends Controller
         $room->description = $data['description'];
         $room->capacity = $data['capacity'];
         $room->type = $data['type'];
+        // Save latitude/longitude if provided by the admin (from Nominatim)
+        if (!empty($data['latitude'])) {
+            $room->latitude = $data['latitude'];
+        }
+        if (!empty($data['longitude'])) {
+            $room->longitude = $data['longitude'];
+        }
         $room->status = 'available';
 
         $room->save();
@@ -80,7 +89,9 @@ class RoomController extends Controller
                     throw new \RuntimeException('Unable to store thumbnail.');
                 }
 
-                $room->thumbnail_url = Storage::disk('gcs')->url($storedPath);
+                /** @var \Illuminate\Filesystem\FilesystemAdapter $gcsDisk */
+                $gcsDisk = Storage::disk('gcs');
+                $room->thumbnail_url = $gcsDisk->url($storedPath);
                 $room->save();
             } catch (\Throwable $e) {
                 $room->delete();
@@ -125,6 +136,8 @@ class RoomController extends Controller
             'type' => 'required|string|in:single,double,suite,vip,family_suite',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'thumbnail_url' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $room->name = $data['name'];
@@ -133,6 +146,13 @@ class RoomController extends Controller
         $room->description = $data['description'];
         $room->capacity = $data['capacity'];
         $room->type = $data['type'];
+        // Update latitude/longitude when admin edits the room
+        if (array_key_exists('latitude', $data)) {
+            $room->latitude = $data['latitude'];
+        }
+        if (array_key_exists('longitude', $data)) {
+            $room->longitude = $data['longitude'];
+        }
 
         if ($request->hasFile('thumbnail')) {
             // Xóa ảnh cũ nếu có trên GCS
@@ -148,7 +168,9 @@ class RoomController extends Controller
             
             // Upload ảnh mới lên GCS
             $request->file('thumbnail')->storeAs($folderPath, $filename, 'gcs');
-            $room->thumbnail_url = Storage::disk('gcs')->url($folderPath . '/' . $filename);
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $gcsDisk */
+            $gcsDisk = Storage::disk('gcs');
+            $room->thumbnail_url = $gcsDisk->url($folderPath . '/' . $filename);
             
         } elseif ($request->filled('thumbnail_url')) {
             $room->thumbnail_url = $data['thumbnail_url'];
