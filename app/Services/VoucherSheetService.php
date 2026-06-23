@@ -8,6 +8,22 @@ class VoucherSheetService
 {
     private const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTA6BbwO5PJ98dtrsBHdPDOyOMjp6LaCUmJWhHY2luRh9D-AsnKTGkJmwnFgJgEs8-HhvAZ9oL9lnvR/pub?output=tsv';
 
+    public function publicSheetUrl(): string
+    {
+        return self::SHEET_URL;
+    }
+
+    public function manageSheetUrl(): string
+    {
+        $manageUrl = (string) env('GOOGLE_SHEETS_VOUCHER_MANAGE_URL', '');
+
+        if ($manageUrl !== '') {
+            return $manageUrl;
+        }
+
+        return preg_replace('/\/pub\?output=tsv$/', '/pubhtml', self::SHEET_URL) ?? self::SHEET_URL;
+    }
+
     /**
      * @return array<int, array{code:string,discount:string,type:string,status:string}>
      */
