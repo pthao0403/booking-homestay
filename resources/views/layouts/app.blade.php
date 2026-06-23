@@ -52,7 +52,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
-</div>
 
         <script type="text/javascript">
             function googleTranslateElementInit() {
@@ -65,7 +64,5 @@
         </script>
         <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     </body>
-</html>
-</body>
 </html>
 
