@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+// IMPORT THƯ VIỆN GOOGLE CHÍNH CHỦ
+use Google\Client as GoogleClient;
+use Google\Service\Drive as GoogleServiceDrive;
+use Google\Service\Drive\DriveFile;
 
 class BookingController extends Controller
 {
-
-
     /**
      * Display a listing of the user's bookings.
      */
@@ -38,19 +40,21 @@ class BookingController extends Controller
 
         return view('bookings.history', compact('bookings'));
     }
-public function handleForm(Request $request) {
-    // Gửi request kiểm tra lên Google
-    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-        'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
-        'response' => $request->input('g-recaptcha-response'),
-    ]);
 
-    if (!$response->json()['success']) {
-        return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+    public function handleForm(Request $request) {
+        // Gửi request kiểm tra lên Google
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
+            'response' => $request->input('g-recaptcha-response'),
+        ]);
+
+        if (!$response->json()['success']) {
+            return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+        }
+        
+        // Tiếp tục xử lý logic đăng nhập/đăng ký...
     }
-    
-    // Tiếp tục xử lý logic đăng nhập/đăng ký...
-}
+
     /**
      * Store a newly created booking in storage.
      */
@@ -131,9 +135,51 @@ public function handleForm(Request $request) {
             \Illuminate\Support\Facades\Log::error('Tạo Google Calendar event thất bại: ' . $e->getMessage());
         }
 
+        // ==========================================
+        // TÍNH NĂNG ĐỘC LẠ: TỰ ĐỘNG UP HOÁ ĐƠN LÊN GOOGLE DRIVE
+        // ==========================================
+        try {
+            // Khởi tạo file hóa đơn dạng text
+            $fileName = 'HoaDon_Booking_' . $booking->id . '_' . now()->format('Ymd_His') . '.txt';
+            $fileContent = "=== HOÁ ĐƠN ĐẶT PHÒNG CLOUDSTAY ===\n";
+            $fileContent .= "Mã đặt phòng: #" . $booking->id . "\n";
+            $fileContent .= "Tên phòng: " . $room->name . "\n";
+            $fileContent .= "Khách hàng: " . Auth::user()->name . "\n";
+            $fileContent .= "Email: " . Auth::user()->email . "\n";
+            $fileContent .= "Thời gian ở: " . $checkin . " đến " . $checkout . " (" . $days . " đêm)\n";
+            $fileContent .= "Số lượng khách: " . $request->guests . " người\n";
+            $fileContent .= "Tổng tiền thanh toán: " . number_format($totalPrice) . " VND\n";
+            $fileContent .= "Trạng thái: Đang chờ duyệt (Pending)\n";
+            $fileContent .= "Ngày xuất hóa đơn: " . now()->toDateTimeString() . "\n";
+
+            // Kết nối Google API Client
+            $client = new GoogleClient();
+            $client->setAuthConfig(storage_path('app/google-service-account.json'));
+            $client->addScope(GoogleServiceDrive::DRIVE);
+            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            $driveService = new GoogleServiceDrive($client);
+
+            // Cấu hình metadata để đẩy vào thư mục chỉ định
+            $fileMetadata = new DriveFile([
+                'name' => $fileName,
+                'parents' => [env('GOOGLE_DRIVE_FOLDER_ID')]
+            ]);
+
+            // Thực thi upload dữ liệu dạng text thuần lên Drive
+            $driveService->files->create($fileMetadata, [
+                'data' => $fileContent,
+                'mimeType' => 'text/plain',
+                'uploadType' => 'multipart',
+                'fields' => 'id',
+                'supportsAllDrives' => true,
+            ]);
+        } catch (\Exception $e) {
+            // Đưa về dạng ghi log âm thầm như cũ khi chạy thực tế
+            \Illuminate\Support\Facades\Log::error('Lỗi upload Google Drive API: ' . $e->getMessage());
+        }
+
         return redirect()->route('bookings.show', $booking)->with('success', 'Đặt phòng thành công! Yêu cầu của bạn đang chờ phê duyệt.');
     }
-
     /**
      * Display the specified booking detail.
      */
