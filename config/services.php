@@ -43,6 +43,7 @@ return [
 
     'google_analytics' => [
         'measurement_id' => env('GA_MEASUREMENT_ID'),
+        'manage_url' => env('GOOGLE_ANALYTICS_MANAGE_URL'),
     ],
 
 ];

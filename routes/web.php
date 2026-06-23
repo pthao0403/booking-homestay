@@ -84,6 +84,8 @@ Route::middleware(['auth'])->group(function () {
         return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue', 'totalVouchers', 'activeVouchers', 'expiredVouchers'));
     })->name('admin.dashboard');
     Route::get('/admin/google-vouchers', function (VoucherSheetService $voucherSheetService) {
+        abort_unless(Auth::user()?->role === 'admin', 403);
+
         $vouchers = array_map(function (array $voucher) use ($voucherSheetService): array {
             $voucher['label'] = $voucherSheetService->formatDiscount($voucher);
 
@@ -101,6 +103,15 @@ Route::middleware(['auth'])->group(function () {
             'publicSheetUrl' => $voucherSheetService->publicSheetUrl(),
         ]);
     })->name('admin.google-vouchers');
+
+    Route::get('/admin/google-analytics', function () {
+        abort_unless(Auth::user()?->role === 'admin', 403);
+
+        return view('admin.google-analytics', [
+            'measurementId' => config('services.google_analytics.measurement_id'),
+            'manageUrl' => config('services.google_analytics.manage_url'),
+        ]);
+    })->name('admin.google-analytics');
 
     // Admin Room CRUD Routes
     Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
