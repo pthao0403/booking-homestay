@@ -52,7 +52,7 @@
                                     <td class="py-3 fw-semibold" style="color: #334155;">{{ $booking->room->name }}</td>
                                     <td class="py-3">{{ $booking->check_in ? $booking->check_in->format('d/m/Y') : 'N/A' }}</td>
                                     <td class="py-3">{{ $booking->check_out ? $booking->check_out->format('d/m/Y') : 'N/A' }}</td>
-                                    <td class="py-3 fw-bold text-primary">{{ number_format((float)$booking->total_price) }} VNĐ</td>
+                                    <td class="py-3 fw-bold text-primary">{{ number_format((float)$booking->payable_total) }} VNĐ</td>
                                     <td class="py-3 text-center">
                                         @if($booking->status === 'pending')
                                             <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1.5" style="border-radius: 30px; font-size: 0.8rem;">Chờ duyệt</span>

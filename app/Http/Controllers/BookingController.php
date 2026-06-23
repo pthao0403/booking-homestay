@@ -63,6 +63,9 @@ class BookingController extends Controller
             'check_in' => ['required', 'date', 'after_or_equal:today'],
             'check_out' => ['required', 'date', 'after:check_in'],
             'guests' => ['required', 'integer', 'min:1'],
+            'voucher_code' => ['nullable', 'string'],
+            'discount_amount' => ['nullable', 'numeric'],
+            'final_total' => ['nullable', 'numeric'],
         ]);
 
         $room = Room::findOrFail($request->room_id);
@@ -100,6 +103,13 @@ class BookingController extends Controller
             $days = 1; // Tối thiểu 1 đêm
         }
         $totalPrice = $days * $room->price;
+        $discountAmount = $request->discount_amount ?? 0;
+        $finalTotal = $request->final_total ?? $totalPrice;
+
+        if ($finalTotal > $totalPrice || $finalTotal < 0) {
+            $finalTotal = $totalPrice;
+            $discountAmount = 0;
+        }
 
         // 4. Lưu thông tin đặt phòng
         $booking = Booking::create([
@@ -109,7 +119,10 @@ class BookingController extends Controller
             'checkout_date' => $checkout,
             'total_guests' => $request->guests,
             'total_price' => $totalPrice,
-            'status' => 'pending', // Chờ xử lý/duyệt
+            'status' => 'pending',
+            'voucher_code' => $request->voucher_code ? strtoupper($request->voucher_code) : null,
+            'discount_amount' => $discountAmount,
+            'final_total' => $finalTotal,
         ]);
 
         // Gửi email xác nhận đặt phòng (Gmail SMTP)
@@ -124,7 +137,11 @@ class BookingController extends Controller
             if (config('google-calendar.calendar_id')) {
                 $event = new \Spatie\GoogleCalendar\Event;
                 $event->name = "[Booking] {$room->name} - Khách: " . Auth::user()->name;
-                $event->description = "Email: " . Auth::user()->email . "\nSố lượng: {$request->guests} người\nTổng tiền: " . number_format($totalPrice) . " VNĐ";
+                $event->description = "Email: " . Auth::user()->email .
+                    "\nSố lượng: {$request->guests} người" .
+                    "\nMã giảm giá: " . ($request->voucher_code ?? 'Không có') .
+                    "\nGiảm giá: " . number_format($discountAmount) . " VNĐ" .
+                    "\nTổng tiền sau giảm: " . number_format($finalTotal) . " VNĐ";
                 $event->startDateTime = Carbon::parse($checkin)->setTime(14, 0);
                 $event->endDateTime = Carbon::parse($checkout)->setTime(12, 0);
                 $event->save();

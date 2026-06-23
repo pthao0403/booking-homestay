@@ -25,7 +25,7 @@ class GoogleCalendarService
         $details = "Mã đặt phòng: #{$booking->id}\n"
                  . "Tên homestay: {$booking->room->name}\n"
                  . "Số khách: {$booking->guests} người\n"
-                 . "Tổng giá tiền: " . number_format($booking->total_price) . " VNĐ\n"
+                 . "Tổng giá tiền: " . number_format($booking->payable_total) . " VNĐ\n"
                  . "Trạng thái: Chờ phê duyệt\n"
                  . "Cảm ơn bạn đã lựa chọn CloudStay!";
         

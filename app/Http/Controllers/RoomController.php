@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Services\VoucherSheetService;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -59,8 +60,13 @@ class RoomController extends Controller
     /**
      * Show the booking page for the room.
      */
-    public function booking(Room $room)
+    public function booking(Room $room, VoucherSheetService $voucherSheetService)
     {
-        return view('rooms.booking', compact('room'));
+        $featuredVoucher = $voucherSheetService->featured();
+        $featuredVoucherLabel = $featuredVoucher
+            ? $voucherSheetService->formatDiscount($featuredVoucher)
+            : null;
+
+        return view('rooms.booking', compact('room', 'featuredVoucher', 'featuredVoucherLabel'));
     }
 }

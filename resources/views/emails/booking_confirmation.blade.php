@@ -180,7 +180,7 @@
                 
                 <div class="total-row">
                     <span class="total-label">TỔNG CỘNG:</span>
-                    <span class="total-value">{{ number_format($booking->total_price) }} VNĐ</span>
+                    <span class="total-value">{{ number_format($booking->payable_total) }} VNĐ</span>
                 </div>
             </div>
 

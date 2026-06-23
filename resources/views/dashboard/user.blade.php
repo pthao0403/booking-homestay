@@ -187,7 +187,7 @@
             <p class="mb-4 text-white-50">Theo dõi booking gần đây, tiến độ xử lý và thông tin tài khoản của bạn tại một nơi.</p>
             <div class="d-flex flex-wrap gap-2">
                 <a href="{{ route('bookings.index') }}" class="btn btn-light btn-sm px-4">Xem lịch sử đặt phòng</a>
-                <a href="{{ route('profile.index') }}" class="btn btn-outline-light btn-sm px-4">Cập nhật hồ sơ</a>
+                <a href="{{ route('profile.index') }}" class="btn btn-light btn-sm px-4">Cập nhật hồ sơ</a>
             </div>
         </section>
 
@@ -233,7 +233,7 @@
                                     {{ optional($booking->checkin_date)->format('d/m/Y') }} - {{ optional($booking->checkout_date)->format('d/m/Y') }}
                                 </div>
                                 <div class="booking-meta">
-                                    {{ number_format((float) $booking->total_price) }} VND - {{ $booking->total_guests }} khach
+                                    {{ number_format((float) $booking->payable_total) }} VND - {{ $booking->total_guests }} khach
                                 </div>
                             </div>
                             <div class="d-flex flex-column align-items-start align-items-md-end gap-2">
