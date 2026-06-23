@@ -171,8 +171,8 @@
             <hr class="my-4" style="border-color: #e2e8f0;">
 
             <div class="d-flex gap-2">
-                <a href="{{ route('bookings.index') }}" class="btn btn-outline-secondary w-50 py-2.5 fw-semibold" style="border-radius: 10px;">Lịch sử đặt phòng</a>
-                <a href="{{ route('rooms.index') }}" class="btn btn-primary w-50 py-2.5 fw-semibold" style="border-radius: 10px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Khám phá phòng khác</a>
+                <a href="{{ route('bookings.index') }}" class="btn btn-primary w-50 py-2.5 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 10px; min-height: 52px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Lịch sử đặt phòng</a>
+                <a href="{{ route('rooms.index') }}" class="btn btn-primary w-50 py-2.5 fw-semibold d-flex align-items-center justify-content-center" style="border-radius: 10px; min-height: 52px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Khám phá phòng khác</a>
             </div>
         </div>
     </div>

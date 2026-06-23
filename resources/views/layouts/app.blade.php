@@ -44,6 +44,18 @@
     @include('partials.navbar')
 
     <main>
+        @unless(request()->routeIs('home'))
+            <div class="container pt-3">
+                <button
+                    type="button"
+                    class="page-back-button"
+                    onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ route('home') }}'; }"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Quay lại</span>
+                </button>
+            </div>
+        @endunless
         @yield('content')
     </main>
 
@@ -63,6 +75,26 @@ function googleTranslateElementInit() {
 </script>
 
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<style>
+    .page-back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid #dbe3f0;
+        background: #fff;
+        color: #0f172a;
+        border-radius: 999px;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .page-back-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    }
+</style>
 </body>
 </html>
-
