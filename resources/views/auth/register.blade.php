@@ -42,6 +42,10 @@
                 @enderror
             </div>
             
+
+        <div class="mt-4 flex justify-center">
+            <div class="g-recaptcha" data-sitekey="6LeYGy4tAAAAAEZ5RbWMHeG1akKzenTZEcwD4bDA"></div>
+        </div>
             <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="border-radius: 8px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">Đăng ký</button>
         </form>
         

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -26,7 +27,19 @@ class AuthController extends Controller
         ]);
 
         $remember = $request->has('remember');
+    }
+    public function handleForm(Request $request) {
+    // Gửi request kiểm tra lên Google
+    $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        'secret' => '6LeYGy4tAAAAAO0wIg8dQthlvEqxtNXl6S7c1v6f',
+        'response' => $request->input('g-recaptcha-response'),
+    ]);
 
+    if (!$response->json()['success']) {
+        return back()->withErrors(['captcha' => 'Vui lòng xác minh bạn không phải là người máy!']);
+    }
+    
+    // Tiếp tục xử lý logic đăng nhập/đăng ký...
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
