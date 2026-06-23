@@ -83,7 +83,24 @@ Route::middleware(['auth'])->group(function () {
 
         return view('admin.dashboard', compact('totalRooms', 'totalUsers', 'totalBookings', 'revenue', 'totalVouchers', 'activeVouchers', 'expiredVouchers'));
     })->name('admin.dashboard');
-    
+    Route::get('/admin/google-vouchers', function (VoucherSheetService $voucherSheetService) {
+        $vouchers = array_map(function (array $voucher) use ($voucherSheetService): array {
+            $voucher['label'] = $voucherSheetService->formatDiscount($voucher);
+
+            return $voucher;
+        }, $voucherSheetService->all());
+
+        $activeVouchers = array_values(array_filter($vouchers, fn (array $voucher): bool => $voucher['status'] === 'active'));
+        $expiredVouchers = array_values(array_filter($vouchers, fn (array $voucher): bool => $voucher['status'] === 'expired'));
+
+        return view('admin.google-vouchers', [
+            'vouchers' => $vouchers,
+            'activeCount' => count($activeVouchers),
+            'expiredCount' => count($expiredVouchers),
+            'manageSheetUrl' => $voucherSheetService->manageSheetUrl(),
+            'publicSheetUrl' => $voucherSheetService->publicSheetUrl(),
+        ]);
+    })->name('admin.google-vouchers');
 
     // Admin Room CRUD Routes
     Route::resource('admin/rooms', AdminRoomController::class)->names('admin.rooms');
