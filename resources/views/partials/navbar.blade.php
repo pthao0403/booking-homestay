@@ -6,15 +6,17 @@
         </a>
 
         <div class="ms-auto d-flex align-items-center gap-2 flex-wrap justify-content-end me-2">
-            <a href="{{ route('login') }}"
-               class="btn btn-light btn-sm">
-                Đăng nhập
-            </a>
+            @guest
+                <a href="{{ route('login') }}"
+                   class="btn btn-light btn-sm">
+                    Đăng nhập
+                </a>
 
-            <a href="{{ route('register') }}"
-               class="btn btn-warning btn-sm">
-                Đăng ký
-            </a>
+                <a href="{{ route('register') }}"
+                   class="btn btn-warning btn-sm">
+                    Đăng ký
+                </a>
+            @endguest
         </div>
 
         <button class="navbar-toggler"
