@@ -14,6 +14,8 @@ class Room extends Model
         'name',
         'price',
         'address',
+        'latitude',
+        'longitude',
         'description',
         'thumbnail_url',
         'status',
