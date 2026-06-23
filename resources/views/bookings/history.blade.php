@@ -62,7 +62,7 @@
 
 <div class="history-container container">
     <h2 class="history-title">Lịch Sử Đặt Phòng Của Tôi</h2>
-    
+
     @php
         $currentStatus = request('status', 'all');
     @endphp
@@ -73,7 +73,7 @@
         <a href="?status=completed" class="filter-btn-custom {{ $currentStatus === 'completed' ? 'active' : '' }}">Đã hoàn thành</a>
         <a href="?status=cancelled" class="filter-btn-custom {{ $currentStatus === 'cancelled' ? 'active' : '' }}">Đã hủy</a>
     </div>
-    
+
     <div class="bookings-list d-flex flex-column gap-3">
         @forelse($bookings as $booking)
             <div class="card booking-card-premium shadow-sm p-4">
@@ -94,7 +94,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 <div class="row bg-light p-3 rounded-3 mb-3 text-start">
                     <div class="col-md-3 col-6 mb-2 mb-md-0">
                         <span class="text-muted d-block" style="font-size: 0.8rem;">Ngày nhận phòng</span>
@@ -110,13 +110,36 @@
                     </div>
                     <div class="col-md-3 col-6">
                         <span class="text-muted d-block" style="font-size: 0.8rem;">Tổng chi phí</span>
-                        <strong class="text-primary">{{ number_format((float)$booking->total_price) }} VNĐ</strong>
+                        <strong class="text-primary">{{ number_format((float) $booking->payable_total) }} VNĐ</strong>
                     </div>
                 </div>
-                
+
+                @if($booking->voucher_code || (float) $booking->discount_amount > 0)
+                    <div class="bg-white border rounded-3 p-3 mb-3 text-start">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-6">
+                                <span class="text-muted d-block" style="font-size: 0.8rem;">Giá gốc</span>
+                                <strong>{{ number_format((float) $booking->total_price) }} VNĐ</strong>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="text-muted d-block" style="font-size: 0.8rem;">Mã giảm giá</span>
+                                <strong>{{ $booking->voucher_code ?? 'Không có' }}</strong>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="text-muted d-block" style="font-size: 0.8rem;">Giảm giá</span>
+                                <strong class="text-success">-{{ number_format((float) $booking->discount_amount) }} VNĐ</strong>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="text-muted d-block" style="font-size: 0.8rem;">Thanh toán</span>
+                                <strong class="text-primary">{{ number_format((float) $booking->payable_total) }} VNĐ</strong>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('bookings.show', $booking) }}" class="btn btn-outline-secondary btn-sm px-3 py-1.5" style="border-radius: 8px;">Xem hóa đơn chi tiết</a>
-                    
+
                     @if($booking->status === 'pending')
                         <a href="{{ route('bookings.cancel', $booking) }}" class="btn btn-danger btn-sm px-3 py-1.5" style="border-radius: 8px;" onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu đặt phòng này?')">Hủy đặt phòng</a>
                     @endif

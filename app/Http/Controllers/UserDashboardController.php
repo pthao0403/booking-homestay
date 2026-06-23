@@ -26,7 +26,7 @@ class UserDashboardController extends Controller
             'confirmedBookings' => (clone $bookingsQuery)->where('status', 'confirmed')->count(),
             'totalSpent' => (clone $bookingsQuery)
                 ->whereIn('status', ['confirmed', 'completed'])
-                ->sum('total_price'),
+                ->sum(\Illuminate\Support\Facades\DB::raw('COALESCE(final_total, total_price)')),
         ];
 
         return view('dashboard.user', [
